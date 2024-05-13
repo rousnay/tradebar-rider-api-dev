@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import axios from 'axios';
 import { JwtService } from '@nestjs/jwt';
-import { CreateRiderDto } from 'src/riders/dtos/create-rider.dto';
+import { CreateRiderDto } from 'src/riders/dtos/create-riders.dto';
 import { Riders } from 'src/riders/entities/riders.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
