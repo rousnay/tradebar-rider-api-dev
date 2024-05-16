@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'src/auth/constants';
+import { jwtConstants } from '../../common/constants/constants';
 import { Riders } from './entities/riders.entity'; // Import your RiderEntity
 import { RidersService } from './services/riders.service';
 import { RiderController } from './controllers/riders.controller';

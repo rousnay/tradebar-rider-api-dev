@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from './auth.service';
-import { LocalStrategy } from './local.strategy';
-import { JwtStrategy } from './jwt.strategy';
+import { LocalStrategy } from '../../core/guards/local.strategy';
+import { JwtStrategy } from '../../core/guards/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
-import { PasswordService } from './password.service';
+import { jwtConstants } from '../../common/constants/constants';
+import { PasswordService } from '../../core/guards/password.service';
 import { AuthController } from './auth.controller';
-import { Riders } from 'src/riders/entities/riders.entity';
+import { Riders } from 'src/modules/riders/entities/riders.entity';
 
 @Module({
   imports: [

@@ -8,9 +8,9 @@ import { UpdateRidersDto } from '../dtos/update-riders.dto';
 import { ApiResponseDto } from '../dtos/api-response.dto';
 import { Riders } from '../entities/riders.entity';
 
-
 @Injectable()
 export class RidersService {
+  logger: any;
   constructor(
     @Inject(REQUEST) private readonly request: Request,
     private jwtService: JwtService,
@@ -34,6 +34,8 @@ export class RidersService {
     });
 
     const totalCount = await this.ridersRepository.count();
+
+    // throw new NotFoundException('Riders not found');
 
     return {
       message: 'Riders fetched successfully',
@@ -148,6 +150,4 @@ export class RidersService {
       data: rider,
     };
   }
-
-
 }

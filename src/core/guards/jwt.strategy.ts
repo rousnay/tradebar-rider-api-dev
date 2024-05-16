@@ -1,9 +1,9 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { jwtConstants } from './constants';
+import { jwtConstants } from '../../common/constants/constants';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Riders } from 'src/riders/entities/riders.entity';
+import { Riders } from 'src/modules/riders/entities/riders.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()

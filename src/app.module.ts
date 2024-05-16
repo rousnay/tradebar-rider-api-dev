@@ -4,8 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { RidersModule } from './riders/riders.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { RidersModule } from './modules/riders/riders.module';
 import configPayment from './config/payment.config';
 
 @Module({

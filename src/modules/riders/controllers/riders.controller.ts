@@ -28,7 +28,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
 import { RidersService } from '../services/riders.service';
 
 import { Riders } from '../entities/riders.entity';
@@ -191,9 +191,7 @@ export class RiderController {
       console.log(filePath);
     }
 
-    const result = await this.ridersService.editRiderProfile(
-      updateRiderDto,
-    );
+    const result = await this.ridersService.editRiderProfile(updateRiderDto);
 
     return {
       status: 'success',
