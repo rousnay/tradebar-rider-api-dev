@@ -161,7 +161,7 @@ export class AuthService {
         );
       } else {
         // console.error('Error registering user:', error);
-        console.error('Error generating OTP:', error);
+        // console.error('Error generating OTP:', error);
         throw new HttpException(
           'Internal server error',
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -498,10 +498,11 @@ export class AuthService {
         throw new HttpException(
           {
             statusCode: error.response.status,
-            message:
+            message: [
               error.response.data.error.message ||
-              error.response.statusText ||
-              'Internal server error',
+                error.response.statusText ||
+                'Internal server error',
+            ],
             error: error.response.statusText,
           },
           error.response.status,
@@ -605,8 +606,6 @@ export class AuthService {
     try {
       const decoded = this.jwtService.verify(token);
 
-      console.log(decoded);
-
       const {
         payload: { username, sub },
       } = decoded;
@@ -681,7 +680,6 @@ export class AuthService {
 
   async validateUser(payload: any): Promise<any> {
     // Extract user id from the payload
-    console.log(payload);
     const rider_id = payload.sub;
 
     // Find the user in the database by userId

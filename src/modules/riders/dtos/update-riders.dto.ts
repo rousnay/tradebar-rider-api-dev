@@ -6,6 +6,8 @@ import {
   IsOptional,
   IsDateString,
   IsEmpty,
+  IsEmail,
+  IsPhoneNumber,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Gender } from '../entities/riders.entity'; // Adjust the import path if necessary
@@ -13,14 +15,14 @@ import { Gender } from '../entities/riders.entity'; // Adjust the import path if
 export class UpdateRidersDto {
   @IsOptional()
   @IsString()
-  @IsEmpty({ each: true })
+  // @IsEmpty({ each: true })
   @ApiProperty({ description: 'First name', required: false })
   first_name: string;
 
   @IsOptional()
   @IsString()
   @ApiProperty({ description: 'Last name', required: false })
-  last_name: string;
+  last_name?: string;
 
   @IsOptional()
   @IsString()
@@ -28,12 +30,15 @@ export class UpdateRidersDto {
   phone?: string;
 
   @IsOptional()
-  @IsString()
+  @IsEmail({}, { message: 'Invalid email format' })
   @ApiProperty({ description: 'Email address', required: false })
   email?: string;
 
   @IsOptional()
-  @IsDateString()
+  @IsDateString(
+    {},
+    { message: 'Date format must be a valid ISO 8601 date string' },
+  )
   @ApiProperty({ description: 'Date of birth', type: Date, required: false })
   date_of_birth?: Date;
 

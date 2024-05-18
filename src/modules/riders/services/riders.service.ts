@@ -8,6 +8,8 @@ import { UpdateRidersDto } from '../dtos/update-riders.dto';
 import { ApiResponseDto } from '../dtos/api-response.dto';
 import { Riders } from '../entities/riders.entity';
 
+import * as Sentry from '@sentry/node';
+
 @Injectable()
 export class RidersService {
   logger: any;
@@ -67,84 +69,30 @@ export class RidersService {
     });
 
     if (!rider) {
-      throw new NotFoundException('Riders not found');
+      throw new NotFoundException('Rider not found');
     }
 
-    const queryPartsForSQL = [];
-    const parametersForSQL = [];
+    // Update the rider's profile directly in the database
+    await this.ridersRepository.update({ id: riderId }, updateRiderDto);
 
-    // Update rider fields if they are truthy in updateRiderDto
-    if (updateRiderDto.first_name) {
-      rider.first_name = updateRiderDto.first_name;
-
-      queryPartsForSQL.push('first_name = ?');
-      parametersForSQL.push(updateRiderDto.first_name);
-    }
-    if (updateRiderDto.last_name) {
-      rider.last_name = updateRiderDto.last_name;
-
-      queryPartsForSQL.push('last_name = ?');
-      parametersForSQL.push(updateRiderDto.last_name);
-    }
-    if (updateRiderDto.phone) {
-      rider.phone = updateRiderDto.phone;
-
-      queryPartsForSQL.push('phone = ?');
-      parametersForSQL.push(updateRiderDto.phone);
-    }
-    if (updateRiderDto.email) {
-      rider.email = updateRiderDto.email;
-
-      queryPartsForSQL.push('email = ?');
-      parametersForSQL.push(updateRiderDto.email);
-    }
-    if (updateRiderDto.date_of_birth) {
-      rider.date_of_birth = updateRiderDto.date_of_birth;
-    }
-    if (updateRiderDto.gender) {
-      rider.gender = updateRiderDto.gender;
-    }
-    if (updateRiderDto.is_active !== undefined) {
-      rider.is_active = updateRiderDto.is_active;
-    }
-
-    // Save the updated rider
-    await this.ridersRepository.save(rider);
-
-    // Update the users table based on the changes made to the riders table
-
-    // const query = `
-    //   UPDATE users
-    //   SET first_name = ?, last_name = ?, email = ?, phone = ?
-    //   WHERE id = ?
-    // `;
-
-    if (queryPartsForSQL.length !== 0) {
-      const queryForSQL = `
-      UPDATE users
-      SET ${queryPartsForSQL.join(', ')}
-      WHERE id = ?
-    `;
-      parametersForSQL.push(rider.user_id);
-
-      await this.entityManager.query(queryForSQL, parametersForSQL);
-    }
-
-    // await this.ridersRepository.update(
-    //   { id: riderId },
-    //   updateRidersDto,
-    // );
-
-    const editedRider = await this.ridersRepository.findOne({
+    // Fetch the updated rider profile
+    const updatedRider = await this.ridersRepository.findOne({
       where: { id: riderId },
     });
-    return { data: editedRider };
+
+    return { data: updatedRider };
   }
 
-  public async getRider(riderId: number): Promise<{ data: Riders }> {
+  public async getRiderById(riderId: number): Promise<{ data: Riders }> {
     const rider = await this.ridersRepository.findOne({
       where: { id: riderId },
     });
+
+    if (!rider) {
+      throw new NotFoundException('Riders not found');
+    }
+
+    // Sentry.getCurrentScope().setTransactionName('UserListView 22');
 
     return {
       data: rider,

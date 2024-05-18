@@ -3,7 +3,9 @@ import { AppModule } from './app.module';
 import { configSwagger } from './config/swagger.config';
 import * as Sentry from '@sentry/node';
 import { SentryFilter } from './core/filters/sentry.filter';
+// import { HttpExceptionFilter } from './http-exception.filter.ts';
 import { ValidationPipe } from '@nestjs/common';
+import { CustomValidationPipe } from './core/pipes/custom-validation.pipe';
 import { LoggerFactory } from './config/winston.config';
 // import { NestExpressApplication } from '@nestjs/platform-express';
 
@@ -31,6 +33,8 @@ async function bootstrap() {
 
   // Enable validation globally
   // app.useGlobalPipes(new ValidationPipe());
+  // Use the custom validation pipe globally
+  app.useGlobalPipes(new CustomValidationPipe());
 
   // Initialize Sentry by passing the DNS included in the .env
   Sentry.init({

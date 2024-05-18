@@ -12,6 +12,7 @@ import {
   Put,
   UseInterceptors,
   UploadedFile,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiHeader,
@@ -206,10 +207,10 @@ export class RiderController {
   @ApiParam({ name: 'riderId', type: Number })
   @ApiResponse({ status: 200, type: Riders })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  public async getRider(
-    @Param('riderId') riderId: number,
+  public async getRiderById(
+    @Param('riderId', ParseIntPipe) riderId: number,
   ): Promise<{ message: string; status: string; data: Riders }> {
-    const result = await this.ridersService.getRider(riderId);
+    const result = await this.ridersService.getRiderById(riderId);
     return {
       status: 'success',
       message: 'Rider fetched successfully',
