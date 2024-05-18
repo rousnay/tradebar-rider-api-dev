@@ -48,14 +48,38 @@ export class Riders extends BaseEntity {
   @Column({ nullable: true })
   profile_image_url: string;
 
+  @Column({ nullable: true })
+  driving_license_number: string;
+
+  @Column({ nullable: true })
+  driving_license_authorized_office_id: number;
+
+  @Column({ nullable: true })
+  driving_license_image_url: string;
+
+  @Column({ nullable: true })
+  driving_verification_selfie_image_url: string;
+
+  @Column({ nullable: true })
+  driving_city_id: number;
+
+  @Column({ nullable: true })
+  driving_destination_range_id: number;
+
+  @Column({ nullable: true })
+  driving_schedule_id: number;
+
+  @Column({ default: false })
+  is_driving_license_verified: boolean;
+
+  @Column({ default: true })
+  is_active: boolean;
+
   @CreateDateColumn({ type: 'timestamp' })
   registration_date: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
   last_login: Date;
-
-  @Column({ default: true })
-  is_active: boolean;
 
   @CreateDateColumn({
     type: 'timestamp',

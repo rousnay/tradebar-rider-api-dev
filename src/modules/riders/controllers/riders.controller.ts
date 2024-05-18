@@ -43,8 +43,8 @@ import { RidersQueryParamsDto } from '../dtos/riders-query-params.dto';
 //   name: 'X-MyHeader',
 //   description: 'Custom header',
 // })
-@Controller('riders')
-@ApiTags('Riders')
+@Controller('rider')
+@ApiTags('Rider')
 export class RiderController {
   constructor(private ridersService: RidersService) {}
 
@@ -56,54 +56,6 @@ export class RiderController {
     summary: 'Get all riders',
     // description: 'Returns an example response',
   })
-  @ApiResponse({
-    status: 200,
-    description: 'List of riders',
-    // type: ApiResponseDto,
-    content: {
-      'application/json': {
-        // schema: {
-        //   type: 'object',
-        //   properties: {
-        //     message: { type: 'string', example: 'This is an example message' },
-        //     data: {
-        //       type: 'object',
-        //       properties: {
-        //         id: { type: 'number', example: 1 },
-        //         name: { type: 'string', example: 'John Doe' },
-        //       },
-        //     },
-        //   },
-        // },
-        example: {
-          message: 'Riders fetched successfully',
-          status: 'success',
-          totalCount: 1,
-          currentPage: 1,
-          currentLimit: 10,
-          data: [
-            {
-              id: 3,
-              user_id: 44,
-              first_name: 'Mozahidur',
-              last_name: 'Rahman',
-              phone: '01711111111',
-              email: 'rousnay@revinr.com',
-              date_of_birth: null,
-              gender: null,
-              profile_image_url: null,
-              registration_date: '2024-04-21T11:47:24.000Z',
-              last_login: '2024-04-21T05:47:42.541Z',
-              is_active: true,
-              created_at: '2024-04-21T05:47:42.541Z',
-              updated_at: '2024-04-21T05:47:42.541Z',
-            },
-          ],
-        },
-      },
-    },
-  })
-  @ApiResponse({ status: 403, description: 'Forbidden.' })
   @UsePipes(new RiderQueryParamsPipe())
   public async getRiders(
     @Query() queryParams: RidersQueryParamsDto,
