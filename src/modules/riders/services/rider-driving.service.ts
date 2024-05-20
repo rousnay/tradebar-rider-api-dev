@@ -43,16 +43,16 @@ export class RiderDrivingService {
       throw new NotFoundException(`Rider with ID ${rider_id} not found`);
     }
 
-    if (driving_license_image) {
-      // Assuming you have some logic to handle file upload and storage
-      // e.g., saving the file to a storage service and getting the URL
-      rider.driving_license_image_url = 'path/to/uploaded/license_image';
-    }
+    // if (driving_license_image) {
+    //   // Assuming you have some logic to handle file upload and storage
+    //   // e.g., saving the file to a storage service and getting the URL
+    //   rider.driving_license_image_url = 'path/to/uploaded/license_image';
+    // }
 
-    if (driving_verification_selfie_image) {
-      // Similarly, handle the selfie image file
-      rider.profile_image_url = 'path/to/uploaded/verification_selfie_image';
-    }
+    // if (driving_verification_selfie_image) {
+    //   // Similarly, handle the selfie image file
+    //   rider.profile_image_url = 'path/to/uploaded/verification_selfie_image';
+    // }
 
     Object.assign(rider, updateRiderDrivingLicenseDto);
 

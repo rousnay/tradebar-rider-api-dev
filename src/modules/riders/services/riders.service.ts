@@ -3,8 +3,7 @@ import { InjectRepository, InjectEntityManager } from '@nestjs/typeorm';
 import { Repository, Like, EntityManager } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { CreateRiderDto } from '../dtos/create-riders.dto';
-import { UpdateRidersDto } from '../dtos/update-riders.dto';
+import { UpdateRiderDto } from '../dtos/update-riders.dto';
 import { ApiResponseDto } from '../dtos/api-response.dto';
 import { Riders } from '../entities/riders.entity';
 
@@ -61,8 +60,8 @@ export class RidersService {
   }
 
   public async editRiderProfile(
-    updateRiderDto: UpdateRidersDto,
-  ): Promise<{ data: Riders }> {
+    updateRiderDto: UpdateRiderDto,
+  ): Promise<{ data: any }> {
     const riderId = this.request['user'].id;
     const rider = await this.ridersRepository.findOne({
       where: { id: riderId },
@@ -80,7 +79,9 @@ export class RidersService {
       where: { id: riderId },
     });
 
-    return { data: updatedRider };
+    return {
+      data: updatedRider,
+    };
   }
 
   public async getRiderById(riderId: number): Promise<{ data: Riders }> {

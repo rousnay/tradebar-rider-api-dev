@@ -9,53 +9,45 @@ import {
   IsEmail,
   IsPhoneNumber,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+// import { PartialType } from '@nestjs/mapped-types';
+import { CreateRiderDto } from './create-riders.dto';
 import { Gender } from '../entities/riders.entity'; // Adjust the import path if necessary
 
-export class UpdateRidersDto {
-  @IsOptional()
-  @IsString()
-  // @IsEmpty({ each: true })
-  @ApiProperty({ description: 'First name', required: false })
-  first_name: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty({ description: 'Last name', required: false })
-  last_name?: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty({ description: 'Phone number', required: false })
-  phone?: string;
-
-  @IsOptional()
-  @IsEmail({}, { message: 'Invalid email format' })
-  @ApiProperty({ description: 'Email address', required: false })
-  email?: string;
-
+export class UpdateRiderDto extends PartialType(CreateRiderDto) {
   @IsOptional()
   @IsDateString(
     {},
     { message: 'Date format must be a valid ISO 8601 date string' },
   )
-  @ApiProperty({ description: 'Date of birth', type: Date, required: false })
+  @ApiProperty({
+    description: 'Format: YYYY-MM-DD',
+    type: Date,
+    required: false,
+  })
   date_of_birth?: Date;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'Gender', enum: Gender, required: false })
+  @ApiProperty({
+    description: 'Gender',
+    enum: Gender,
+    required: false,
+  })
   gender?: Gender | null;
 
-  // @IsOptional()
-  // @ApiProperty({
-  //   type: 'string',
-  //   format: 'binary',
-  //   required: false,
-  // })
-  // profile_image: Express.Multer.File;
+  @IsOptional()
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'Profile image',
+    required: false,
+  })
+  profile_image?: Express.Multer.File;
 
   @IsOptional()
-  @ApiProperty({ description: 'Active status', required: false })
-  is_active?: boolean;
+  profile_image_url?: string;
+
+  @IsOptional()
+  profile_image_cf_media_id?: number;
 }

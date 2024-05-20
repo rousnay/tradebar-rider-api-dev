@@ -108,23 +108,22 @@ export class AuthService {
         const userData = response?.data?.data?.user;
 
         // Create a new Rider entity based on the registration data
-        const createRiderDto: CreateRiderDto = {
+        // const createRiderDto: CreateRiderDto = {
+        //   first_name: userData?.first_name,
+        //   last_name: userData?.last_name,
+        //   phone: userData?.phone,
+        //   email: userData?.email,
+        //   registration_date: userData?.created_at,
+        // };
+
+        // Create a new Riders entity
+        const newRider = Riders.create({
           user_id: userData?.id,
           first_name: userData?.first_name,
           last_name: userData?.last_name,
           phone: userData?.phone,
           email: userData?.email,
           registration_date: userData?.created_at,
-        };
-
-        // Create a new Riders entity
-        const newRider = Riders.create({
-          user_id: createRiderDto.user_id,
-          first_name: createRiderDto.first_name,
-          last_name: createRiderDto.last_name,
-          phone: createRiderDto.phone,
-          email: userData.email,
-          registration_date: createRiderDto.registration_date,
         });
 
         // Save the new Rider entity to the database

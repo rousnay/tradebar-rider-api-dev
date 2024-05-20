@@ -35,9 +35,9 @@ import { RidersService } from '../services/riders.service';
 import { Riders } from '../entities/riders.entity';
 import { RiderQueryParamsPipe } from '../riders-query-params.pipe';
 import { ApiResponseDto } from '../dtos/api-response.dto';
-// import { CreateRiderDto } from '../dtos/create-rider.dto';
-import { UpdateRidersDto } from '../dtos/update-riders.dto';
+import { UpdateRiderDto } from '../dtos/update-riders.dto';
 import { RidersQueryParamsDto } from '../dtos/riders-query-params.dto';
+import { CloudFlareMediaService } from 'src/services/cloud_flare_media.service';
 
 // @ApiHeader({
 //   name: 'X-MyHeader',
@@ -46,7 +46,10 @@ import { RidersQueryParamsDto } from '../dtos/riders-query-params.dto';
 @Controller('rider')
 @ApiTags('Rider')
 export class RiderController {
-  constructor(private ridersService: RidersService) {}
+  constructor(
+    private ridersService: RidersService,
+    private readonly cloudFlareMediaService: CloudFlareMediaService,
+  ) {}
 
   // Get all riders ++++++++++++++++++++++++++++++++++++
   @Get('all')
@@ -93,58 +96,44 @@ export class RiderController {
   @Patch('/profile/edit/')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access_token')
-  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Update rider profile' })
-  @ApiBody({ type: UpdateRidersDto })
-  @UseInterceptors(
-    FileInterceptor('profile_image', {
-      storage: diskStorage({
-        destination: '/tmp', // Destination folder for uploaded files
-        filename: (req, file, callback) => {
-          const originalName = file.originalname;
-          const date = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
-          const time = new Date().toLocaleTimeString('en-US', {
-            hour12: false,
-          }); // Current time in HH:MM:SS format
-          const formattedTime = time.replace(/:/g, '-'); // Replacing colons with underscores for HH_MM_SS
-          const randomNumber = Math.floor(1000 + Math.random() * 9000); // Random 4-digit number
-
-          const fileNameParts = [
-            originalName.replace(/\.[^/.]+$/, ''), // File name without extension
-            date,
-            formattedTime,
-            randomNumber.toString(),
-          ];
-
-          const finalFileName =
-            fileNameParts.join('_') + extname(file.originalname); // Join parts with underscores
-          return callback(null, finalFileName);
-        },
-      }),
-    }),
-  )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateRiderDto })
+  @UseInterceptors(FileInterceptor('profile_image'))
   @ApiResponse({ status: 200, type: Riders })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   public async editRiderProfile(
     @UploadedFile() profile_image: Express.Multer.File,
-    @Body() formData: UpdateRidersDto, // Use FormDataPipe
+    @Body() formData: UpdateRiderDto, // Use FormDataPipe
   ): Promise<{ message: string; status: string; data: Riders }> {
-    const updateRiderDto = new UpdateRidersDto();
+    let cf_media_id = null;
+    let profile_image_url = null;
+
+    if (profile_image) {
+      const result = await this.cloudFlareMediaService.uploadMedia(
+        profile_image,
+        {
+          model: 'Rider-ProfileImage',
+          model_id: 99,
+          image_type: 'thumbnail',
+        },
+      );
+      cf_media_id = result?.data?.id;
+      profile_image_url = result?.data?.media_url;
+    }
+
+    const updateRiderDto = new UpdateRiderDto();
     updateRiderDto.first_name = formData.first_name;
     updateRiderDto.last_name = formData.last_name;
     updateRiderDto.phone = formData.phone;
     updateRiderDto.email = formData.email;
     updateRiderDto.date_of_birth = formData.date_of_birth;
     updateRiderDto.gender = formData.gender;
-    updateRiderDto.is_active = formData.is_active;
-
-    if (profile_image) {
-      console.log(profile_image);
-      const filePath = profile_image.path; // Path to the uploaded file
-      console.log(filePath);
-    }
+    updateRiderDto.profile_image_cf_media_id = cf_media_id;
 
     const result = await this.ridersService.editRiderProfile(updateRiderDto);
+
+    result.data.profile_image_url = profile_image_url;
 
     return {
       status: 'success',

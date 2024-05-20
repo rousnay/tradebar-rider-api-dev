@@ -46,7 +46,7 @@ export class Riders extends BaseEntity {
   gender: Gender | null; // Define the column as nullable in the entity
 
   @Column({ nullable: true })
-  profile_image_url: string;
+  profile_image_cf_media_id: number;
 
   @Column({ nullable: true })
   driving_license_number: string;
@@ -55,10 +55,10 @@ export class Riders extends BaseEntity {
   driving_license_authorized_office_id: number;
 
   @Column({ nullable: true })
-  driving_license_image_url: string;
+  driving_license_cf_media_id: string;
 
   @Column({ nullable: true })
-  driving_verification_selfie_image_url: string;
+  verification_selfie_cf_media_id: string;
 
   @Column({ nullable: true })
   driving_city_id: number;
@@ -75,10 +75,10 @@ export class Riders extends BaseEntity {
   @Column({ default: true })
   is_active: boolean;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamp', nullable: true })
   registration_date: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: 'timestamp', nullable: true })
   last_login: Date;
 
   @CreateDateColumn({
