@@ -37,9 +37,11 @@ async function bootstrap() {
   app.useGlobalPipes(new CustomValidationPipe());
 
   // Initialize Sentry by passing the DNS included in the .env
-  Sentry.init({
-    dsn: process.env.SENTRY_DNS,
-  });
+  if (process.env.NODE_ENV === 'staging') {
+    Sentry.init({
+      dsn: process.env.SENTRY_DNS,
+    });
+  }
 
   // Import the filter globally, capturing all exceptions on all routes
   const { httpAdapter } = app.get(HttpAdapterHost);
