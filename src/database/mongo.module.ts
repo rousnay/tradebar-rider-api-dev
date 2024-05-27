@@ -14,10 +14,6 @@ import { ConfigModule } from 'src/config/config.module';
         uri: configService.mongodbUri,
       }),
     }),
-    // MongooseModule.forRoot('mongodb://localhost/nest', {
-    //   useNewUrlParser: true,
-    //   useUnifiedTopology: true,
-    // }),
   ],
 })
 export class MongoModule {}
