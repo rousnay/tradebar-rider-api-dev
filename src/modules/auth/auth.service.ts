@@ -202,16 +202,11 @@ export class AuthService {
             where: { user_id: user_id },
           });
 
-          console.log(user_id);
-          console.log(rider.id);
+          // console.log(user_id);
+          // console.log(rider.id);
 
           const payload = { username: rider.email, sub: rider.id };
-          const access_token = this.jwtService.sign(
-            { ...payload },
-            {
-              expiresIn: '30d',
-            },
-          );
+          const access_token = this.jwtService.sign(payload);
 
           return {
             status: 'success',
@@ -266,7 +261,7 @@ export class AuthService {
       formData.append('password', password);
       formData.append('user_type', 'rider');
 
-      console.log(formData);
+      // console.log(formData);
 
       const config = {
         headers: {
@@ -336,19 +331,14 @@ export class AuthService {
         const user_id = await response?.data?.data?.user.id;
 
         if (user_id) {
-          console.log(user_id);
+          // console.log(user_id);
           //get rider data by user_id
           const rider = await this.riderRepository.findOne({
             where: { user_id: user_id },
           });
 
           const payload = { username: rider.email, sub: rider.id };
-          const access_token = this.jwtService.sign(
-            { ...payload },
-            {
-              expiresIn: '30d',
-            },
-          );
+          const access_token = this.jwtService.sign(payload);
 
           return {
             status: 'success',
@@ -618,7 +608,7 @@ export class AuthService {
         .catch((error) => {
           console.error('Error executing query:', error);
         });
-      console.log('test1');
+      // console.log('test1');
       if (users.length === 0) {
         return null;
       }
@@ -647,7 +637,7 @@ export class AuthService {
     try {
       const decoded = this.jwtService.verify(token);
 
-      console.log(decoded);
+      // console.log(decoded);
 
       const {
         payload: { username, sub },
@@ -662,7 +652,7 @@ export class AuthService {
         .catch((error) => {
           console.error('Error executing query:', error);
         });
-      console.log('test1');
+      // console.log('test1');
       if (users.length === 0) {
         return null;
       }

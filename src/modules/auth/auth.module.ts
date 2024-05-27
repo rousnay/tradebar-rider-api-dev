@@ -16,12 +16,13 @@ import { Riders } from 'src/modules/riders/entities/riders.entity';
     ConfigModule,
     PassportModule,
     TypeOrmModule.forFeature([Riders]),
+    // JwtModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.jwtSecret,
-        signOptions: { expiresIn: '30d' },
+        signOptions: { expiresIn: '90d' },
       }),
     }),
     // JwtModule.register({
