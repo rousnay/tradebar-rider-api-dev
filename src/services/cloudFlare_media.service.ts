@@ -3,19 +3,25 @@ import { EntityManager } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import * as FormData from 'form-data';
+import { ConfigService } from 'src/config/config.service';
+import { AppConstants } from 'src/common/constants/constants';
 @Injectable()
 export class CloudFlareMediaService {
-  private readonly cfAccId = process.env.CLOUDFLARE_ACCOUNT_ID;
-  private readonly cfApiToken = process.env.CLOUDFLARE_API_TOKEN;
-  private readonly cfAccountHash = process.env.CLOUDFLARE_ACCOUNT_HASH;
-  private readonly cfVariant = 'public';
-  private readonly cfGetApiUrl = 'https://imagedelivery.net';
-  private readonly cfPostApiBaseUrl =
-    'https://api.cloudflare.com/client/v4/accounts';
+  private readonly cfAccId: string;
+  private readonly cfApiToken: string;
+  private readonly cfAccountHash: string;
+  private readonly cfMediaVariant = AppConstants.cloudFlare.mediaVariant;
+  private readonly cfMediaBaseUrl = AppConstants.cloudFlare.mediaBaseUrl;
+  private readonly cfApiBaseUrl = AppConstants.cloudFlare.apiBaseUrl;
   constructor(
     private readonly entityManager: EntityManager,
     private readonly httpService: HttpService,
-  ) {}
+    configService: ConfigService,
+  ) {
+    this.cfAccId = configService.cloudFlareAccountId;
+    this.cfApiToken = configService.cloudFlareApiToken;
+    this.cfAccountHash = configService.cloudFlareAccountHash;
+  }
 
   async uploadMedia(file: Express.Multer.File, args: any): Promise<any> {
     const imageTypes = ['regular', 'cover', 'thumbnail'];
@@ -33,7 +39,7 @@ export class CloudFlareMediaService {
 
     const filename = Date.now() + '-' + file.originalname.split('.').pop();
 
-    const postUrl = `${this.cfPostApiBaseUrl}/${this.cfAccId}/images/v1`;
+    const postUrl = `${this.cfApiBaseUrl}/${this.cfAccId}/images/v1`;
     const formData = new FormData();
     formData.append('file', file.buffer, file.originalname);
 
@@ -74,13 +80,13 @@ export class CloudFlareMediaService {
           .getRawOne();
 
         const media_url =
-          this.cfGetApiUrl +
+          this.cfMediaBaseUrl +
           '/' +
           this.cfAccountHash +
           '/' +
           cf_id +
           '/' +
-          this.cfVariant;
+          this.cfMediaVariant;
 
         return {
           message: 'Media has been uploaded successfully',

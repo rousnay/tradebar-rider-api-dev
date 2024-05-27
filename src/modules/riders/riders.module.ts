@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { HttpModule, HttpService } from '@nestjs/axios';
+import { ConfigModule } from 'src/config/config.module';
 import { Riders } from './entities/riders.entity';
 import { RidersService } from './services/riders.service';
 import { RiderController } from './controllers/riders.controller';
@@ -17,12 +18,13 @@ import { CloudFlareMediaService } from 'src/services/cloudFlare_media.service';
 
 @Module({
   imports: [
+    ConfigModule,
+    JwtModule,
     HttpModule.register({
       timeout: 5000,
       maxRedirects: 5,
     }),
     TypeOrmModule.forFeature([Riders, Vehicles, RiderVehicles]),
-    JwtModule,
   ],
   exports: [RidersService],
   providers: [
