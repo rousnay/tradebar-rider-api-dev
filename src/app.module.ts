@@ -7,10 +7,23 @@ import { AuthModule } from './modules/auth/auth.module';
 import { RidersModule } from './modules/riders/riders.module';
 import { MysqlModule } from './database/mysql.module';
 import { MongoModule } from './database/mongo.module';
+import { ChatGateway } from './websocket/chat.gateway';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { ChatController } from './websocket/chat.controller';
 
 @Module({
-  imports: [ConfigModule, MysqlModule, MongoModule, AuthModule, RidersModule],
-  providers: [AppService],
-  controllers: [AppController],
+  imports: [
+    ConfigModule,
+    MysqlModule,
+    MongoModule,
+    AuthModule,
+    RidersModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+  ],
+  providers: [AppService, ChatGateway],
+  controllers: [AppController, ChatController],
 })
 export class AppModule {}
