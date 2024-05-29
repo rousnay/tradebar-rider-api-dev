@@ -49,22 +49,25 @@ export class VehiclesService {
         const vehicleTypeObj = await this.vehicleTypeService.findOne(
           vehicle.type_id,
         );
+        let vehicle_image_url = null;
 
-        const cloudflare_id = await this.entityManager
-          .createQueryBuilder()
-          .select(['cf.cloudflare_id'])
-          .from('cf_media', 'cf')
-          .where('cf.id = :id', { id: vehicle.vehicle_image_cf_media_id })
-          .getRawOne();
+        if (vehicle.vehicle_image_cf_media_id != null) {
+          const cloudflare_id = await this.entityManager
+            .createQueryBuilder()
+            .select(['cf.cloudflare_id'])
+            .from('cf_media', 'cf')
+            .where('cf.id = :id', { id: vehicle.vehicle_image_cf_media_id })
+            .getRawOne();
 
-        const vehicle_image_url =
-          this.cfMediaBaseUrl +
-          '/' +
-          this.cfAccountHash +
-          '/' +
-          cloudflare_id.cloudflare_id +
-          '/' +
-          this.cfMediaVariant;
+          vehicle_image_url =
+            this.cfMediaBaseUrl +
+            '/' +
+            this.cfAccountHash +
+            '/' +
+            cloudflare_id.cloudflare_id +
+            '/' +
+            this.cfMediaVariant;
+        }
 
         // Destructure vehicle to remove type_id
         const { type_id, ...vehicleWithoutTypeId } = vehicle;
@@ -97,21 +100,25 @@ export class VehiclesService {
       vehicle.type_id,
     );
 
-    const cloudflare_id = await this.entityManager
-      .createQueryBuilder()
-      .select(['cf.cloudflare_id'])
-      .from('cf_media', 'cf')
-      .where('cf.id = :id', { id: vehicle.vehicle_image_cf_media_id })
-      .getRawOne();
+    let vehicle_image_url = null;
 
-    const vehicle_image_url =
-      this.cfMediaBaseUrl +
-      '/' +
-      this.cfAccountHash +
-      '/' +
-      cloudflare_id.cloudflare_id +
-      '/' +
-      this.cfMediaVariant;
+    if (vehicle.vehicle_image_cf_media_id != null) {
+      const cloudflare_id = await this.entityManager
+        .createQueryBuilder()
+        .select(['cf.cloudflare_id'])
+        .from('cf_media', 'cf')
+        .where('cf.id = :id', { id: vehicle.vehicle_image_cf_media_id })
+        .getRawOne();
+
+      vehicle_image_url =
+        this.cfMediaBaseUrl +
+        '/' +
+        this.cfAccountHash +
+        '/' +
+        cloudflare_id.cloudflare_id +
+        '/' +
+        this.cfMediaVariant;
+    }
 
     // Destructure vehicle to remove type_id
     const { type_id, ...vehicleWithoutTypeId } = vehicle;
@@ -169,23 +176,25 @@ export class VehiclesService {
       vehicle.type_id,
     );
 
-    const cloudflare_id = await this.entityManager
-      .createQueryBuilder()
-      .select(['cf.cloudflare_id'])
-      .from('cf_media', 'cf')
-      .where('cf.id = :id', { id: vehicle.vehicle_image_cf_media_id })
-      .getRawOne();
+    let vehicle_image_url = null;
 
-    console.log(cloudflare_id);
+    if (vehicle.vehicle_image_cf_media_id != null) {
+      const cloudflare_id = await this.entityManager
+        .createQueryBuilder()
+        .select(['cf.cloudflare_id'])
+        .from('cf_media', 'cf')
+        .where('cf.id = :id', { id: vehicle.vehicle_image_cf_media_id })
+        .getRawOne();
 
-    const vehicle_image_url =
-      this.cfMediaBaseUrl +
-      '/' +
-      this.cfAccountHash +
-      '/' +
-      cloudflare_id.cloudflare_id +
-      '/' +
-      this.cfMediaVariant;
+      vehicle_image_url =
+        this.cfMediaBaseUrl +
+        '/' +
+        this.cfAccountHash +
+        '/' +
+        cloudflare_id.cloudflare_id +
+        '/' +
+        this.cfMediaVariant;
+    }
 
     // Destructure vehicle to remove type_id
     const { type_id, ...vehicleWithoutTypeId } = vehicle;

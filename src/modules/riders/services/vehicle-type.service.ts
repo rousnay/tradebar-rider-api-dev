@@ -6,7 +6,7 @@ import { VehicleTypeDto } from '../dtos/vehicle-type.dto';
 // Define a class representing your transportation vehicles service
 @Injectable()
 export class VehicleTypeService {
-  private readonly base_url = 'https://imagedelivery.net';
+  private readonly base_url = 'https://imagedelivery.net'; //NEED REWORK
   private readonly account_hash = 'GoCn5FC83XAthwamRI9Rdg';
   private readonly variant = 'public';
   constructor(
