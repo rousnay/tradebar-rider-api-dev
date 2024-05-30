@@ -19,26 +19,7 @@ export class FirebaseAdminService {
     });
   }
 
-  async sendNotificationToSingleDevice(
-    token: string,
-    payload: admin.messaging.MessagingPayload,
-  ): Promise<string> {
-    const message: admin.messaging.Message = {
-      token,
-      notification: payload.notification,
-      data: payload.data,
-    };
-
-    // return await this.app.messaging().send(message);
-
-    // Mocking the response
-    const response = `mock_message_id_${token}`;
-
-    console.log('Mocked FCM Response:', response);
-    return response;
-  }
-
-  async sendNotificationToMultipleDevice(
+  async sendNotification(
     tokens: string[],
     payload: admin.messaging.MessagingPayload,
   ): Promise<admin.messaging.BatchResponse> {

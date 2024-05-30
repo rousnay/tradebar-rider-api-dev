@@ -1,9 +1,9 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { FirebaseAdminService } from 'src/services/firebase-admin.service';
-import { SingleDeviceNotificationDto } from './dtos/single-device-notification.dto';
-import { MultipleDevicesNotificationDto } from './dtos/multiple.devices.notification.dto';
 import { NotificationService } from './notification.service';
+import { SendNotificationDto } from './dtos/send-notification.dto';
+import { SendDeliveryRequestNotificationDto } from './dtos/delivery-request-notification.dto';
 
 @ApiTags('Notifications')
 @Controller('notifications')
@@ -13,83 +13,39 @@ export class NotificationsController {
     private readonly notificationService: NotificationService,
   ) {}
 
-  @Post('device')
-  @ApiOperation({ summary: 'Send a notification to a single device' })
-  @ApiResponse({
-    status: 201,
-    description: 'Notification sent and stored successfully.',
-  })
-  @ApiResponse({ status: 400, description: 'Invalid input.' })
-  async sendNotificationToSingleDevice(
-    @Body() singleDeviceNotificationDto: SingleDeviceNotificationDto,
-  ) {
-    const payload = {
-      notification: {
-        title: singleDeviceNotificationDto.title,
-        body: singleDeviceNotificationDto.message,
-      },
-      data: singleDeviceNotificationDto.data
-        ? { customData: singleDeviceNotificationDto.data }
-        : undefined,
-    };
-
-    // Send the notification to a single device
-    const response =
-      await this.firebaseAdminService.sendNotificationToSingleDevice(
-        singleDeviceNotificationDto.token,
-        payload,
-      );
-
-    // Log or handle the response if needed
-    console.log('FCM Response:', response);
-
-    // Store the notification
-    await this.notificationService.createNotification(
-      singleDeviceNotificationDto.userId,
-      singleDeviceNotificationDto.title,
-      singleDeviceNotificationDto.message,
-      singleDeviceNotificationDto.data,
-    );
-
-    return { message: 'Notification sent and stored', response };
-  }
-
-  @Post('multiple-devices')
-  @ApiOperation({ summary: 'Send a notification to multiple devices' })
+  @Post('send')
+  @ApiOperation({ summary: 'Send a notification to targeted devices' })
   @ApiResponse({
     status: 201,
     description: 'Notifications sent and stored successfully.',
   })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
-  async sendNotification(
-    @Body() multipleDevicesNotificationDto: MultipleDevicesNotificationDto,
-  ) {
+  async sendNotification(@Body() sendNotificationDto: SendNotificationDto) {
     const payload = {
       notification: {
-        title: multipleDevicesNotificationDto.title,
-        body: multipleDevicesNotificationDto.message,
+        title: sendNotificationDto.title,
+        body: sendNotificationDto.message,
       },
-      data: multipleDevicesNotificationDto.data
-        ? { customData: multipleDevicesNotificationDto.data }
+      data: sendNotificationDto.data
+        ? { customData: sendNotificationDto.data }
         : undefined,
     };
 
     // Send the notification to multiple devices
-    const response =
-      await this.firebaseAdminService.sendNotificationToMultipleDevice(
-        multipleDevicesNotificationDto.tokens,
-        payload,
-      );
+    const response = await this.firebaseAdminService.sendNotification(
+      sendNotificationDto.tokens,
+      payload,
+    );
 
     // Log or handle the response if needed
     console.log('FCM Response:', response);
 
     // Store the notification
     await this.notificationService.createNotification(
-      multipleDevicesNotificationDto.userId,
-      multipleDevicesNotificationDto.title,
-      multipleDevicesNotificationDto.message,
-      multipleDevicesNotificationDto.data,
+      sendNotificationDto.userId,
+      sendNotificationDto.title,
+      sendNotificationDto.message,
+      sendNotificationDto.data,
     );
 
     return { message: 'Notifications sent and stored', response };
@@ -105,34 +61,34 @@ export class NotificationsController {
   })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
   async sendDeliveryRequestToAllRiders(
-    @Body() multipleDevicesNotificationDto: MultipleDevicesNotificationDto,
+    @Body()
+    sendDeliveryRequestNotificationDto: SendDeliveryRequestNotificationDto,
   ) {
     const payload = {
       notification: {
-        title: multipleDevicesNotificationDto.title,
-        body: multipleDevicesNotificationDto.message,
+        title: sendDeliveryRequestNotificationDto.title,
+        body: sendDeliveryRequestNotificationDto.message,
       },
-      data: multipleDevicesNotificationDto.data
-        ? { customData: multipleDevicesNotificationDto.data }
+      data: sendDeliveryRequestNotificationDto.data
+        ? { customData: sendDeliveryRequestNotificationDto.data }
         : undefined,
     };
 
     // Send the notification to all riders
-    const response =
-      await this.firebaseAdminService.sendNotificationToMultipleDevice(
-        multipleDevicesNotificationDto.tokens,
-        payload,
-      );
+    const response = await this.firebaseAdminService.sendNotification(
+      sendDeliveryRequestNotificationDto.tokens,
+      payload,
+    );
 
     // Log or handle the response if needed
     console.log('FCM Response:', response);
 
     // Store the notification
     await this.notificationService.createNotification(
-      multipleDevicesNotificationDto.userId,
-      multipleDevicesNotificationDto.title,
-      multipleDevicesNotificationDto.message,
-      multipleDevicesNotificationDto.data,
+      sendDeliveryRequestNotificationDto.userId,
+      sendDeliveryRequestNotificationDto.title,
+      sendDeliveryRequestNotificationDto.message,
+      sendDeliveryRequestNotificationDto.data,
     );
 
     return {
