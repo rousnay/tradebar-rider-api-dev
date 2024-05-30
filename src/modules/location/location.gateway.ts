@@ -15,10 +15,6 @@ export class LocationGateway {
 
   constructor(private readonly locationService: LocationService) {}
 
-  // afterInit(server: Server) {
-  //   server.set('origins', '*:*');
-  // }
-
   @SubscribeMessage('updateLocation')
   async handleLocationUpdate(
     client: Socket,

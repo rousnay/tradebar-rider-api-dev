@@ -3,10 +3,10 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import { AppModule } from './app.module';
-import { configSwagger } from './config/swagger.config';
 import { SentryFilter } from './core/filters/sentry.filter';
 import { CustomValidationPipe } from './core/pipes/custom-validation.pipe';
-import { SocketAdapter } from './core/adapters/SocketAdapter';
+import { SocketAdapter } from './core/adapters/socket.adapter';
+import { configSwagger } from './config/swagger.config';
 import { LoggerFactory } from './config/winston.config';
 
 async function bootstrap() {

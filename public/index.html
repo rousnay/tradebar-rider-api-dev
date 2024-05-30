@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>Location</title>
 </head>
@@ -48,9 +48,9 @@
 
       if (riderId && !isNaN(latitude) && !isNaN(longitude)) {
         socket.emit('updateLocation', { riderId, latitude, longitude });
-        riderIdInput.value = '';
-        latitudeInput.value = '';
-        longitudeInput.value = '';
+        // riderIdInput.value = '';
+        // latitudeInput.value = '';
+        // longitudeInput.value = '';
       } else {
         alert('Please enter valid values for Rider ID, Latitude, and Longitude.');
       }
