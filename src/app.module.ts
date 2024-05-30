@@ -9,8 +9,9 @@ import { MysqlModule } from './database/mysql.module';
 import { MongoModule } from './database/mongo.module';
 import { ChatGateway } from './websocket/chat.gateway';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { ChatController } from './websocket/chat.controller';
+import { LocationModule } from './location/location.module';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ChatController } from './websocket/chat.controller';
     MongoModule,
     AuthModule,
     RidersModule,
+    LocationModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),

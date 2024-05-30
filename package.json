@@ -48,6 +48,7 @@
     "exceljs": "^4.4.0",
     "form-data-encoder": "^4.0.2",
     "formdata-node": "^6.0.3",
+    "kafkajs": "^2.2.4",
     "mongodb": "^5.9.2",
     "mongoose": "^7.6.12",
     "mysql2": "^3.6.5",
