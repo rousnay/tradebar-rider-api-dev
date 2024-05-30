@@ -1,4 +1,3 @@
-// src/location/location.gateway.ts
 import {
   SubscribeMessage,
   WebSocketGateway,
