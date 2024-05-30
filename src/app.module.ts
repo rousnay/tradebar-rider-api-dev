@@ -17,11 +17,11 @@ import { NotificationsModule } from './modules/notification/notification.module'
     ConfigModule,
     MysqlModule,
     MongoModule,
-    NotificationsModule,
     AuthModule,
     RidersModule,
     LocationModule,
     ChatModule,
+    NotificationsModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),

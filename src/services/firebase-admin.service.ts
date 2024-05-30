@@ -19,7 +19,26 @@ export class FirebaseAdminService {
     });
   }
 
-  async sendNotification(
+  async sendNotificationToSingleDevice(
+    token: string,
+    payload: admin.messaging.MessagingPayload,
+  ): Promise<string> {
+    const message: admin.messaging.Message = {
+      token,
+      notification: payload.notification,
+      data: payload.data,
+    };
+
+    // return await this.app.messaging().send(message);
+
+    // Mocking the response
+    const response = `mock_message_id_${token}`;
+
+    console.log('Mocked FCM Response:', response);
+    return response;
+  }
+
+  async sendNotificationToMultipleDevice(
     tokens: string[],
     payload: admin.messaging.MessagingPayload,
   ): Promise<admin.messaging.BatchResponse> {
@@ -29,6 +48,19 @@ export class FirebaseAdminService {
       data: payload.data,
     };
 
-    return await this.app.messaging().sendEachForMulticast(message);
+    // return await this.app.messaging().sendEachForMulticast(message);
+
+    // Mocking the response
+    const response = {
+      successCount: tokens.length,
+      failureCount: 0,
+      responses: tokens.map((token) => ({
+        success: true,
+        messageId: `mock_message_id_${token}`,
+      })),
+    };
+
+    console.log('Mocked FCM Response:', response);
+    return response as admin.messaging.BatchResponse;
   }
 }
