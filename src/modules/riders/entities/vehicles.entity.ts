@@ -32,7 +32,7 @@ export class Vehicles {
   @Column({ nullable: true })
   license_plate: string;
 
-  @Column({ length: 60, unique: true, nullable: true })
+  @Column({ length: 60, nullable: true })
   registration_number: string;
 
   @CreateDateColumn({

@@ -19,20 +19,26 @@ export default () => ({
   mongodb: {
     uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/test',
   },
-  cloudFlare: {
-    accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
-    apiToken: process.env.CLOUDFLARE_API_TOKEN,
-    accountHash: process.env.CLOUDFLARE_ACCOUNT_HASH,
+  logger: {
+    level: process.env.LOGGER_LEVEL || 'info',
+    debug: process.env.DEBUG || 'info',
+    json: process.env.USE_JSON_LOGGER,
+    sentryDns: process.env.SENTRY_DNS,
   },
   stripe: {
     publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
     secretKey: process.env.STRIPE_SECRET_KEY,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
   },
-  logger: {
-    level: process.env.LOGGER_LEVEL || 'info',
-    debug: process.env.DEBUG || 'info',
-    json: process.env.USE_JSON_LOGGER,
-    sentryDns: process.env.SENTRY_DNS,
+  cloudFlare: {
+    accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+    apiToken: process.env.CLOUDFLARE_API_TOKEN,
+    accountHash: process.env.CLOUDFLARE_ACCOUNT_HASH,
+  },
+
+  firebase: {
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
   },
 });

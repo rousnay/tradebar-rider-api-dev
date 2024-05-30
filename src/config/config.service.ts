@@ -53,30 +53,6 @@ export class ConfigService {
     return this.configService.get<string>('mongodb.uri');
   }
 
-  get cloudFlareAccountId(): string {
-    return this.configService.get<string>('cloudFlare.accountId');
-  }
-
-  get cloudFlareApiToken(): string {
-    return this.configService.get<string>('cloudFlare.apiToken');
-  }
-
-  get cloudFlareAccountHash(): string {
-    return this.configService.get<string>('cloudFlare.accountHash');
-  }
-
-  get stripePublishableKey(): string {
-    return this.configService.get<string>('stripe.publishableKey');
-  }
-
-  get stripeSecretKey(): string {
-    return this.configService.get<string>('stripe.secretKey');
-  }
-
-  get stripeWebhookSecret(): string {
-    return this.configService.get<string>('stripe.webhookSecret');
-  }
-
   get loggerLevel(): string {
     return this.configService.get<string>('logger.level');
   }
@@ -91,5 +67,40 @@ export class ConfigService {
 
   get sentryDns(): string {
     return this.configService.get<string>('logger.sentryDns');
+  }
+
+  get stripePublishableKey(): string {
+    return this.configService.get<string>('stripe.publishableKey');
+  }
+
+  get stripeSecretKey(): string {
+    return this.configService.get<string>('stripe.secretKey');
+  }
+
+  get stripeWebhookSecret(): string {
+    return this.configService.get<string>('stripe.webhookSecret');
+  }
+  get cloudFlareAccountId(): string {
+    return this.configService.get<string>('cloudFlare.accountId');
+  }
+
+  get cloudFlareApiToken(): string {
+    return this.configService.get<string>('cloudFlare.apiToken');
+  }
+
+  get cloudFlareAccountHash(): string {
+    return this.configService.get<string>('cloudFlare.accountHash');
+  }
+
+  get firebaseProjectId(): string {
+    return this.configService.get<string>('firebase.projectId');
+  }
+
+  get firebaseClientEmail(): string {
+    return this.configService.get<string>('firebase.clientEmail');
+  }
+
+  get firebasePrivateKey(): string {
+    return this.configService.get<string>('firebase.privateKey');
   }
 }

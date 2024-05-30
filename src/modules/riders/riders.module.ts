@@ -14,7 +14,7 @@ import { RiderDrivingService } from './services/rider-driving.service';
 import { Vehicles } from './entities/vehicles.entity';
 import { VehiclesService } from './services/vehicles.service';
 import { VehiclesController } from './controllers/vehicles.controller';
-import { CloudFlareMediaService } from 'src/services/cloudFlare_media.service';
+import { CloudFlareMediaService } from 'src/services/cloudFlare-media.service';
 
 @Module({
   imports: [

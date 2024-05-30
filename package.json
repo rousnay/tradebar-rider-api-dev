@@ -46,6 +46,7 @@
     "core-js": "^3.36.1",
     "dotenv": "^16.3.1",
     "exceljs": "^4.4.0",
+    "firebase-admin": "^12.1.1",
     "form-data-encoder": "^4.0.2",
     "formdata-node": "^6.0.3",
     "kafkajs": "^2.2.4",

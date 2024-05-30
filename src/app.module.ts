@@ -10,12 +10,14 @@ import { AuthModule } from './modules/auth/auth.module';
 import { RidersModule } from './modules/riders/riders.module';
 import { LocationModule } from './modules/location/location.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { NotificationsModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
     ConfigModule,
     MysqlModule,
     MongoModule,
+    NotificationsModule,
     AuthModule,
     RidersModule,
     LocationModule,
