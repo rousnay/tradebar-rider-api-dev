@@ -2,16 +2,20 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { VehicleTypeDto } from '../dtos/vehicle-type.dto';
+import { AppConstants } from 'src/common/constants/constants';
+import { ConfigService } from 'src/config/config.service';
 
-// Define a class representing your transportation vehicles service
 @Injectable()
 export class VehicleTypeService {
-  private readonly base_url = 'https://imagedelivery.net'; //NEED REWORK
-  private readonly account_hash = 'GoCn5FC83XAthwamRI9Rdg';
-  private readonly variant = 'public';
+  private readonly cfAccountHash: string;
+  private readonly cfMediaVariant = AppConstants.cloudflare.mediaVariant;
+  private readonly cfMediaBaseUrl = AppConstants.cloudflare.mediaBaseUrl;
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
-  ) {}
+    configService: ConfigService,
+  ) {
+    this.cfAccountHash = configService.cloudflareAccountHash;
+  }
 
   async findAll(): Promise<VehicleTypeDto[]> {
     try {
@@ -35,13 +39,13 @@ export class VehicleTypeService {
         name: row.name,
         code: row.code,
         media_url:
-          this.base_url +
+          this.cfMediaBaseUrl +
           '/' +
-          this.account_hash +
+          this.cfAccountHash +
           '/' +
           row.cloudflare_id +
           '/' +
-          this.variant,
+          this.cfMediaVariant,
         vehicle_capacity: row.vehicle_capacity,
         active: row.active,
       }));
@@ -72,13 +76,13 @@ export class VehicleTypeService {
       console.log(query);
 
       const media_url =
-        this.base_url +
+        this.cfMediaBaseUrl +
         '/' +
-        this.account_hash +
+        this.cfAccountHash +
         '/' +
         query.cloudflare_id +
         '/' +
-        this.variant;
+        this.cfMediaVariant;
 
       const vehicleTypes: VehicleTypeDto = {
         id: query.id,

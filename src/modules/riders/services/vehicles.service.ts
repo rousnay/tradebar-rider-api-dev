@@ -12,12 +12,9 @@ import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class VehiclesService {
-  private readonly cfAccId: string;
-  private readonly cfApiToken: string;
   private readonly cfAccountHash: string;
-  private readonly cfMediaVariant = AppConstants.cloudFlare.mediaVariant;
-  private readonly cfMediaBaseUrl = AppConstants.cloudFlare.mediaBaseUrl;
-  private readonly cfApiBaseUrl = AppConstants.cloudFlare.apiBaseUrl;
+  private readonly cfMediaVariant = AppConstants.cloudflare.mediaVariant;
+  private readonly cfMediaBaseUrl = AppConstants.cloudflare.mediaBaseUrl;
   constructor(
     @Inject(REQUEST) private readonly request: Request,
     private readonly entityManager: EntityManager,
@@ -28,9 +25,7 @@ export class VehiclesService {
     private vehicleTypeService: VehicleTypeService,
     configService: ConfigService,
   ) {
-    this.cfAccId = configService.cloudFlareAccountId;
-    this.cfApiToken = configService.cloudFlareApiToken;
-    this.cfAccountHash = configService.cloudFlareAccountHash;
+    this.cfAccountHash = configService.cloudflareAccountHash;
   }
 
   async getAllVehiclesOfRider(): Promise<any[]> {

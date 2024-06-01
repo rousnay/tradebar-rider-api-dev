@@ -37,7 +37,7 @@ import { RiderQueryParamsPipe } from '../riders-query-params.pipe';
 import { ApiResponseDto } from '../dtos/api-response.dto';
 import { UpdateRiderDto } from '../dtos/update-riders.dto';
 import { RidersQueryParamsDto } from '../dtos/riders-query-params.dto';
-import { CloudFlareMediaService } from 'src/services/cloudFlare-media.service';
+import { CloudflareMediaService } from 'src/services/cloudflare-media.service';
 
 // @ApiHeader({
 //   name: 'X-MyHeader',
@@ -48,7 +48,7 @@ import { CloudFlareMediaService } from 'src/services/cloudFlare-media.service';
 export class RiderController {
   constructor(
     private ridersService: RidersService,
-    private readonly cloudFlareMediaService: CloudFlareMediaService,
+    private readonly cloudflareMediaService: CloudflareMediaService,
   ) {}
 
   // Get all riders ++++++++++++++++++++++++++++++++++++
@@ -110,7 +110,7 @@ export class RiderController {
     let profile_image_url = null;
 
     if (profile_image) {
-      const result = await this.cloudFlareMediaService.uploadMedia(
+      const result = await this.cloudflareMediaService.uploadMedia(
         profile_image,
         {
           model: 'Rider-ProfileImage',

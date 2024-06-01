@@ -30,7 +30,7 @@ export default () => ({
     secretKey: process.env.STRIPE_SECRET_KEY,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
   },
-  cloudFlare: {
+  cloudflare: {
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
     apiToken: process.env.CLOUDFLARE_API_TOKEN,
     accountHash: process.env.CLOUDFLARE_ACCOUNT_HASH,

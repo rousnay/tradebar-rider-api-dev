@@ -33,14 +33,14 @@ import { CreateVehicleDto } from '../dtos/create-vehicle.dto';
 import { UpdateVehicleDto } from '../dtos/update-vehicle.dto';
 import { Vehicles } from '../entities/vehicles.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CloudFlareMediaService } from 'src/services/cloudFlare-media.service';
+import { CloudflareMediaService } from 'src/services/cloudflare-media.service';
 
 @Controller('rider/vehicle')
 @ApiTags('Rider')
 export class VehiclesController {
   constructor(
     private readonly vehiclesService: VehiclesService,
-    private readonly cloudFlareMediaService: CloudFlareMediaService,
+    private readonly cloudflareMediaService: CloudflareMediaService,
   ) {}
 
   @Get('/all')
@@ -93,7 +93,7 @@ export class VehiclesController {
 
     if (vehicle_image) {
       console.log('vehicle_image exist');
-      const result = await this.cloudFlareMediaService.uploadMedia(
+      const result = await this.cloudflareMediaService.uploadMedia(
         vehicle_image,
         {
           model: 'Rider-vehicleImage',
@@ -143,7 +143,7 @@ export class VehiclesController {
 
     if (vehicle_image) {
       console.log('vehicle_image exist');
-      const result = await this.cloudFlareMediaService.uploadMedia(
+      const result = await this.cloudflareMediaService.uploadMedia(
         vehicle_image,
         {
           model: 'Rider-vehicleImage',

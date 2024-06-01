@@ -80,16 +80,16 @@ export class ConfigService {
   get stripeWebhookSecret(): string {
     return this.configService.get<string>('stripe.webhookSecret');
   }
-  get cloudFlareAccountId(): string {
-    return this.configService.get<string>('cloudFlare.accountId');
+  get cloudflareAccountId(): string {
+    return this.configService.get<string>('cloudflare.accountId');
   }
 
-  get cloudFlareApiToken(): string {
-    return this.configService.get<string>('cloudFlare.apiToken');
+  get cloudflareApiToken(): string {
+    return this.configService.get<string>('cloudflare.apiToken');
   }
 
-  get cloudFlareAccountHash(): string {
-    return this.configService.get<string>('cloudFlare.accountHash');
+  get cloudflareAccountHash(): string {
+    return this.configService.get<string>('cloudflare.accountHash');
   }
 
   get firebaseProjectId(): string {
