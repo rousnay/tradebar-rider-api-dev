@@ -46,18 +46,21 @@ export function GetNearbyRidersSwagger() {
     ApiOperation({ summary: 'Get nearby riders' }),
     ApiQuery({
       name: 'latitude',
+      type: Number,
       description: 'Latitude of the location',
       example: 23.7995,
     }),
     ApiQuery({
       name: 'longitude',
+      type: Number,
       description: 'Longitude of the location',
       example: 90.394,
     }),
     ApiQuery({
       name: 'radius',
+      type: Number,
       description: 'Radius to search for nearby riders',
-      example: 5,
+      example: 15,
     }),
     ApiResponse({
       status: 200,

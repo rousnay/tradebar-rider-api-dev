@@ -38,9 +38,11 @@ export class LocationService {
         { riderId },
         {
           $set: {
-            latitude,
-            longitude,
-            timestamp,
+            location: {
+              type: 'Point',
+              coordinates: [longitude, latitude],
+            },
+            updatedAt: timestamp,
           },
         },
         { upsert: true, new: true },
@@ -97,9 +99,11 @@ export class LocationService {
     longitude: number,
   ): Promise<Location> {
     const location = new this.locationModel({
-      riderId,
-      latitude,
-      longitude,
+      riderId: Number(riderId),
+      location: {
+        type: 'Point',
+        coordinates: [longitude, latitude],
+      },
       updatedAt: new Date(),
     });
     return location.save();
@@ -113,7 +117,15 @@ export class LocationService {
     return this.locationModel
       .findOneAndUpdate(
         { riderId },
-        { latitude, longitude, updatedAt: new Date() },
+        {
+          $set: {
+            location: {
+              type: 'Point',
+              coordinates: [longitude, latitude],
+            },
+            updatedAt: new Date(),
+          },
+        },
         { new: true, upsert: true },
       )
       .exec();
@@ -131,14 +143,34 @@ export class LocationService {
     longitude: number,
     radius: number,
   ): Promise<Location[]> {
-    return this.locationModel
-      .find({
-        location: {
-          $geoWithin: {
-            $centerSphere: [[longitude, latitude], radius / 6371], // radius in miles 3963.2 and in km 6371 is the Earth's radius
+    console.log(
+      'Service: getNearbyRiders called with latitude:',
+      latitude,
+      'longitude:',
+      longitude,
+      'radius:',
+      radius,
+    );
+
+    try {
+      const results = await this.locationModel
+        .find({
+          location: {
+            $geoWithin: {
+              $centerSphere: [[longitude, latitude], radius / 6371], // radius converted to radians
+            },
           },
-        },
-      })
-      .exec();
+        })
+        .exec();
+
+      console.log(
+        'Service: Query successful, found locations:',
+        results.length,
+      );
+      return results;
+    } catch (error) {
+      console.error('Service: Error in getNearbyRiders:', error);
+      throw error;
+    }
   }
 }

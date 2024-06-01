@@ -33,13 +33,13 @@ export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
   @GetLocationOfRiderSwagger()
-  @Get(':riderId')
+  @Get('rider/:riderId')
   async getLocation(@Param('riderId') riderId: number): Promise<Location> {
     return this.locationService.getLocation(riderId);
   }
 
   @UpdateLocationOfRiderSwagger()
-  @Put(':riderId')
+  @Put('rider/:riderId')
   async updateLocation(
     @Param('riderId') riderId: number,
     @Body() updateLocationDto: { latitude: number; longitude: number },
@@ -49,12 +49,20 @@ export class LocationController {
   }
 
   @GetNearbyRidersSwagger()
-  @Get('nearby')
+  @Get('nearby-riders')
   async getNearbyRiders(
     @Query('latitude', ParseFloatPipe) latitude: number,
     @Query('longitude', ParseFloatPipe) longitude: number,
     @Query('radius', ParseIntPipe) radius: number,
-  ): Promise<Location[]> {
+  ): Promise<any> {
+    console.log(
+      'Controller: getNearbyRiders called with latitude:',
+      latitude,
+      'longitude:',
+      longitude,
+      'radius:',
+      radius,
+    );
     return this.locationService.getNearbyRiders(latitude, longitude, radius);
   }
 
