@@ -18,7 +18,7 @@ export class LocationGateway {
   @SubscribeMessage('updateLocation')
   async handleLocationUpdate(
     client: Socket,
-    payload: { riderId: string; latitude: number; longitude: number },
+    payload: { riderId: number; latitude: number; longitude: number },
   ) {
     const location = await this.locationService.updateLocation(
       payload.riderId,
@@ -29,7 +29,7 @@ export class LocationGateway {
   }
 
   @SubscribeMessage('getLocation')
-  async handleGetLocation(client: Socket, riderId: string) {
+  async handleGetLocation(client: Socket, riderId: number) {
     const location = await this.locationService.getLocation(riderId);
     client.emit('locationData', location);
   }

@@ -53,7 +53,8 @@ export class NotificationsController {
 
   @Post('delivery-request')
   @ApiOperation({
-    summary: 'Send a delivery request notification to all riders',
+    summary:
+      'Send a delivery request notification to all active riders nearby the pickup point',
   })
   @ApiResponse({
     status: 201,
