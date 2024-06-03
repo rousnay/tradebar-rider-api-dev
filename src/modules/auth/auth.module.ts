@@ -16,7 +16,6 @@ import { Riders } from 'src/modules/riders/entities/riders.entity';
     ConfigModule,
     PassportModule,
     TypeOrmModule.forFeature([Riders]),
-    // JwtModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -25,11 +24,6 @@ import { Riders } from 'src/modules/riders/entities/riders.entity';
         signOptions: { expiresIn: '90d' },
       }),
     }),
-    // JwtModule.register({
-    //   secret: ConfigService.jwtSecret,
-    //   signOptions: { expiresIn: '30d' },
-    // }),
-    // UsersModule,
   ],
   exports: [AuthService, JwtStrategy],
   providers: [AuthService, LocalStrategy, JwtStrategy, PasswordService],

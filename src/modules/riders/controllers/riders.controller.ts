@@ -30,6 +30,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
+import { profileImageInterceptor } from '../../../core/interceptors/file-interceptor';
 import { RidersService } from '../services/riders.service';
 
 import { Riders } from '../entities/riders.entity';
@@ -99,6 +100,7 @@ export class RiderController {
   @ApiOperation({ summary: 'Update rider profile' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateRiderDto })
+   // @UseInterceptors(profileImageInterceptor)
   @UseInterceptors(FileInterceptor('profile_image'))
   @ApiResponse({ status: 200, type: Riders })
   @ApiResponse({ status: 403, description: 'Forbidden.' })

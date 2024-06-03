@@ -8,7 +8,6 @@ import {
   IsEmail,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Gender } from '../entities/riders.entity'; // Adjust the import path if necessary
 
 export class CreateRiderDto {
   @IsString()

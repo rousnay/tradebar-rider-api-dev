@@ -5,13 +5,12 @@ import {
   Injectable,
   Req,
 } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
 import axios from 'axios';
 import { JwtService } from '@nestjs/jwt';
-import { CreateRiderDto } from 'src/modules/riders/dtos/create-riders.dto';
-import { Riders } from '../riders/entities/riders.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
+import { Riders } from '../riders/entities/riders.entity';
 
 @Injectable()
 export class AuthService {
@@ -107,15 +106,6 @@ export class AuthService {
         // Success response
         const userData = response?.data?.data?.user;
 
-        // Create a new Rider entity based on the registration data
-        // const createRiderDto: CreateRiderDto = {
-        //   first_name: userData?.first_name,
-        //   last_name: userData?.last_name,
-        //   phone: userData?.phone,
-        //   email: userData?.email,
-        //   registration_date: userData?.created_at,
-        // };
-
         // Create a new Riders entity
         const newRider = Riders.create({
           user_id: userData?.id,
@@ -173,12 +163,14 @@ export class AuthService {
     session_id: string,
     password: string,
     password_confirmation: string,
+    device_token: string,
   ): Promise<any> {
     try {
       const formData = new FormData();
       formData.append('session_id', session_id);
       formData.append('password', password);
       formData.append('password_confirmation', password_confirmation);
+      formData.append('device_token', device_token);
 
       const config = {
         headers: {
@@ -307,11 +299,16 @@ export class AuthService {
     }
   }
 
-  async verifyLoginWithOTP(session_id: string, otp: string): Promise<any> {
+  async verifyLoginWithOTP(
+    session_id: string,
+    otp: string,
+    device_token: string,
+  ): Promise<any> {
     try {
       const formData = new FormData();
       formData.append('session_id', session_id);
       formData.append('otp', otp);
+      formData.append('device_token', device_token);
 
       const config = {
         headers: {

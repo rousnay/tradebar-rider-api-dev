@@ -7,20 +7,17 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LocalAuthGuard } from '../../core/guards/local-auth.guard';
-import { AuthGuard } from '@nestjs/passport';
+
 import {
   ApiBody,
   ApiOperation,
   ApiResponse,
-  ApiConsumes,
   ApiTags,
-  ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { AuthService } from './auth.service';
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
@@ -181,12 +178,14 @@ export class AuthController {
       session_id: string;
       password: string;
       password_confirmation: string;
+      device_token: string;
     },
   ) {
     return this.authService.setPassword(
       credentials.session_id,
       credentials.password,
       credentials.password_confirmation,
+      credentials.device_token,
     );
   }
 
@@ -276,8 +275,14 @@ export class AuthController {
       },
     },
   })
-  async verifyLoginWithOTP(@Body() data: { session_id: string; otp: string }) {
-    return this.authService.verifyLoginWithOTP(data.session_id, data.otp);
+  async verifyLoginWithOTP(
+    @Body() data: { session_id: string; otp: string; device_token: string },
+  ) {
+    return this.authService.verifyLoginWithOTP(
+      data.session_id,
+      data.otp,
+      data.device_token,
+    );
   }
 
   @Post('forget-password')

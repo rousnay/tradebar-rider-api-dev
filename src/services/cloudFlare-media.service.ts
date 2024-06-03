@@ -6,21 +6,21 @@ import * as FormData from 'form-data';
 import { ConfigService } from 'src/config/config.service';
 import { AppConstants } from 'src/common/constants/constants';
 @Injectable()
-export class CloudFlareMediaService {
+export class CloudflareMediaService {
   private readonly cfAccId: string;
   private readonly cfApiToken: string;
   private readonly cfAccountHash: string;
-  private readonly cfMediaVariant = AppConstants.cloudFlare.mediaVariant;
-  private readonly cfMediaBaseUrl = AppConstants.cloudFlare.mediaBaseUrl;
-  private readonly cfApiBaseUrl = AppConstants.cloudFlare.apiBaseUrl;
+  private readonly cfMediaVariant = AppConstants.cloudflare.mediaVariant;
+  private readonly cfMediaBaseUrl = AppConstants.cloudflare.mediaBaseUrl;
+  private readonly cfApiBaseUrl = AppConstants.cloudflare.apiBaseUrl;
   constructor(
     private readonly entityManager: EntityManager,
     private readonly httpService: HttpService,
     configService: ConfigService,
   ) {
-    this.cfAccId = configService.cloudFlareAccountId;
-    this.cfApiToken = configService.cloudFlareApiToken;
-    this.cfAccountHash = configService.cloudFlareAccountHash;
+    this.cfAccId = configService.cloudflareAccountId;
+    this.cfApiToken = configService.cloudflareApiToken;
+    this.cfAccountHash = configService.cloudflareAccountHash;
   }
 
   async uploadMedia(file: Express.Multer.File, args: any): Promise<any> {
