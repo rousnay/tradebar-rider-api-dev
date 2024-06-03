@@ -38,7 +38,7 @@ import { RiderQueryParamsPipe } from '../riders-query-params.pipe';
 import { ApiResponseDto } from '../dtos/api-response.dto';
 import { UpdateRiderDto } from '../dtos/update-riders.dto';
 import { RidersQueryParamsDto } from '../dtos/riders-query-params.dto';
-import { CloudflareMediaService } from 'src/services/cloudflare-media.service';
+import { CloudflareMediaService } from '../../../services/cloudflare-media.service';
 
 // @ApiHeader({
 //   name: 'X-MyHeader',
@@ -100,7 +100,7 @@ export class RiderController {
   @ApiOperation({ summary: 'Update rider profile' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateRiderDto })
-   // @UseInterceptors(profileImageInterceptor)
+  // @UseInterceptors(profileImageInterceptor)
   @UseInterceptors(FileInterceptor('profile_image'))
   @ApiResponse({ status: 200, type: Riders })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
