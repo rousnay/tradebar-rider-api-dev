@@ -38,7 +38,8 @@ import { RiderQueryParamsPipe } from '../riders-query-params.pipe';
 import { ApiResponseDto } from '../dtos/api-response.dto';
 import { UpdateRiderDto } from '../dtos/update-riders.dto';
 import { RidersQueryParamsDto } from '../dtos/riders-query-params.dto';
-import { CloudflareMediaService } from '../../../services/cloudflare-media.service';
+// import { CloudflareMediaService } from '../../../services/cloudflare-media.service';
+import { CloudflareMediaService } from '@services/cloudflare-media.service';
 
 // @ApiHeader({
 //   name: 'X-MyHeader',

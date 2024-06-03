@@ -10,9 +10,15 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
     "paths": {
-      "src/*": ["src/*"]
+      "@services/*": ["src/services/*"]
     },
+       // "paths": {
+    //   "src/*": ["src/*"]
+    // },
+    // "esModuleInterop": true,
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
