@@ -19,9 +19,9 @@ import { NotificationsModule } from './modules/notification/notification.module'
     MongoModule,
     AuthModule,
     RidersModule,
-    // LocationModule,
-    // ChatModule,
-    // NotificationsModule,
+    LocationModule,
+    ChatModule,
+    NotificationsModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
