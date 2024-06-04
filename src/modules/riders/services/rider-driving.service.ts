@@ -1,10 +1,11 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { Riders } from '../entities/riders.entity';
 import { UpdateRiderDrivingPreferenceDto } from '../dtos/update-rider-driving-preference.dto';
 import { UpdateRiderDrivingLicenseDto } from '../dtos/update-rider-driving-license.dto';
-import { REQUEST } from '@nestjs/core';
 
 @Injectable()
 export class RiderDrivingService {

@@ -10,7 +10,8 @@ import axios from 'axios';
 import { JwtService } from '@nestjs/jwt';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { Riders } from '../riders/entities/riders.entity';
+
+import { Riders } from '@modules/riders/entities/riders.entity';
 
 @Injectable()
 export class AuthService {

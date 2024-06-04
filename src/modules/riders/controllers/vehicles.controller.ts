@@ -27,13 +27,14 @@ import {
   ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+import { JwtAuthGuard } from '@core/guards/jwt-auth.guard';
+import { CloudflareMediaService } from '@services/cloudflare-media-upload.service';
 import { VehiclesService } from '../services/vehicles.service';
 import { CreateVehicleDto } from '../dtos/create-vehicle.dto';
 import { UpdateVehicleDto } from '../dtos/update-vehicle.dto';
 import { Vehicles } from '../entities/vehicles.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CloudflareMediaService } from 'src/services/cloudflare-media-upload.service';
 
 @Controller('rider/vehicle')
 @ApiTags('Rider')

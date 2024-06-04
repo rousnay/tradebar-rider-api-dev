@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
+
+import { ConfigService } from '@config/config.service';
+import { AppConstants } from '@common/constants/constants';
 import { VehicleTypeDto } from '../dtos/vehicle-type.dto';
-import { AppConstants } from 'src/common/constants/constants';
-import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class VehicleTypeService {

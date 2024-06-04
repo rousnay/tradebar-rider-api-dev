@@ -2,7 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { HttpModule, HttpService } from '@nestjs/axios';
-import { ConfigModule } from 'src/config/config.module';
+
+import { ConfigModule } from '@config/config.module';
+import { CloudflareMediaService } from '@services/cloudflare-media-upload.service';
 import { Riders } from './entities/riders.entity';
 import { RidersService } from './services/riders.service';
 import { RiderController } from './controllers/riders.controller';
@@ -14,8 +16,6 @@ import { RiderDrivingService } from './services/rider-driving.service';
 import { Vehicles } from './entities/vehicles.entity';
 import { VehiclesService } from './services/vehicles.service';
 import { VehiclesController } from './controllers/vehicles.controller';
-// import { CloudflareMediaService } from '../../../services/cloudflare-media-upload.service';
-import { CloudflareMediaService } from '@services/cloudflare-media-upload.service';
 
 @Module({
   imports: [

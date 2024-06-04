@@ -3,11 +3,11 @@ import { InjectRepository, InjectEntityManager } from '@nestjs/typeorm';
 import { Repository, Like, EntityManager } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
+import * as Sentry from '@sentry/node';
+
 import { UpdateRiderDto } from '../dtos/update-riders.dto';
 import { ApiResponseDto } from '../dtos/api-response.dto';
 import { Riders } from '../entities/riders.entity';
-
-import * as Sentry from '@sentry/node';
 
 @Injectable()
 export class RidersService {

@@ -17,7 +17,7 @@ import {
   ApiQuery,
   ApiBody,
 } from '@nestjs/swagger';
-import { LocationService } from './location.service';
+
 import { Location } from './schemas/location.schema';
 import { SetCoordinatesAndSimulateDto } from './dtos/set-coordinates-and-simulate.dto';
 import {
@@ -26,6 +26,7 @@ import {
   SimulateLocationsSwagger,
   UpdateLocationOfRiderSwagger,
 } from './decorators/swagger-decorators';
+import { LocationService } from './location.service';
 
 @ApiTags('Locations')
 @Controller('locations')

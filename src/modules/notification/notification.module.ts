@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from 'src/config/config.module';
-import { FirebaseAdminService } from 'src/services/firebase-admin.service';
+import { ConfigModule } from '@config/config.module';
+import { FirebaseAdminService } from '@services/firebase-admin.service';
+
 import { NotificationService } from './notification.service';
 import { NotificationSchema } from './notification.schema';
 import { NotificationsController } from './notification.controller';

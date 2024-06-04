@@ -27,10 +27,11 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+
+import { JwtAuthGuard } from '@core/guards/jwt-auth.guard';
 import { RiderDrivingService } from '../services/rider-driving.service';
 import { UpdateRiderDrivingPreferenceDto } from '../dtos/update-rider-driving-preference.dto';
 import { UpdateRiderDrivingLicenseDto } from '../dtos/update-rider-driving-license.dto';
-import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
 
 @ApiTags('Rider')
 @Controller('rider/driving')

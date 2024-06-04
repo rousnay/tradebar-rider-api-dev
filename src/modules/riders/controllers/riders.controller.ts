@@ -29,16 +29,18 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
-import { profileImageInterceptor } from '../../../core/interceptors/file-interceptor';
-import { RidersService } from '../services/riders.service';
 
+import { JwtAuthGuard } from '@core/guards/jwt-auth.guard';
+import { profileImageInterceptor } from '@core/interceptors/file-interceptor';
+import { CloudflareMediaService } from '@services/cloudflare-media-upload.service';
+import { RidersService } from '../services/riders.service';
 import { Riders } from '../entities/riders.entity';
 import { RiderQueryParamsPipe } from '../riders-query-params.pipe';
 import { ApiResponseDto } from '../dtos/api-response.dto';
 import { UpdateRiderDto } from '../dtos/update-riders.dto';
 import { RidersQueryParamsDto } from '../dtos/riders-query-params.dto';
-import { CloudflareMediaService } from '../../../services/cloudflare-media-upload.service';
+
+// import { CloudflareMediaService } from '../../../services/cloudflare-media-upload.service';
 
 // @ApiHeader({
 //   name: 'X-MyHeader',

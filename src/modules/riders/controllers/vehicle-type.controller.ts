@@ -1,23 +1,18 @@
 import {
   Controller,
-  Post,
   Get,
-  Delete,
   Param,
-  Body,
-  ParseIntPipe,
   NotFoundException,
   UseGuards,
-  Put,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
+
+import { JwtAuthGuard } from '@core/guards/jwt-auth.guard';
 import { VehicleTypeService } from '../services/vehicle-type.service';
 import { VehicleTypeDto } from '../dtos/vehicle-type.dto';
 

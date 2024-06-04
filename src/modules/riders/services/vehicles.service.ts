@@ -1,14 +1,15 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, EntityManager } from 'typeorm';
+
+import { ConfigService } from '@config/config.service';
+import { AppConstants } from '@common/constants/constants';
 import { Vehicles } from '../entities/vehicles.entity';
 import { RiderVehicles } from '../entities/rider-vehicles.entity';
 import { CreateVehicleDto } from '../dtos/create-vehicle.dto';
 import { UpdateVehicleDto } from '../dtos/update-vehicle.dto';
-import { REQUEST } from '@nestjs/core';
 import { VehicleTypeService } from './vehicle-type.service';
-import { AppConstants } from 'src/common/constants/constants';
-import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class VehiclesService {

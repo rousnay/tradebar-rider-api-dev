@@ -18,10 +18,15 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
 
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
+    // "moduleResolution": "node",
+    // "resolveJsonModule": true,
     "paths": {
-      "@services/*": ["src/services/*"]
+      "@core/*": ["src/core/*"],
+      "@config/*": ["src/config/*"],
+      "@common/*": ["src/common/*"],
+      "@services/*": ["src/services/*"],
+      "@providers/*": ["src/providers/*"],
+      "@modules/*": ["src/modules/*"],
     },
   },
 }
