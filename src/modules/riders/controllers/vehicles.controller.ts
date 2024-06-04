@@ -33,8 +33,7 @@ import { CreateVehicleDto } from '../dtos/create-vehicle.dto';
 import { UpdateVehicleDto } from '../dtos/update-vehicle.dto';
 import { Vehicles } from '../entities/vehicles.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-// import { CloudflareMediaService } from '../../../services/cloudflare-media.service';
-import { CloudflareMediaService } from 'src/services/cloudlareMedia.service';
+import { CloudflareMediaService } from 'src/services/cloudflare-media-upload.service';
 
 @Controller('rider/vehicle')
 @ApiTags('Rider')

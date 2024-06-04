@@ -14,8 +14,8 @@ import { RiderDrivingService } from './services/rider-driving.service';
 import { Vehicles } from './entities/vehicles.entity';
 import { VehiclesService } from './services/vehicles.service';
 import { VehiclesController } from './controllers/vehicles.controller';
-// import { CloudflareMediaService } from '../../../services/cloudflare-media.service';
-import { CloudflareMediaService } from 'src/services/cloudlareMedia.service';
+// import { CloudflareMediaService } from '../../../services/cloudflare-media-upload.service';
+import { CloudflareMediaService } from '@services/cloudflare-media-upload.service';
 
 @Module({
   imports: [

@@ -17,6 +17,11 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "moduleResolution": "node"
+
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "paths": {
+      "@services/*": ["src/services/*"]
+    },
   },
 }
