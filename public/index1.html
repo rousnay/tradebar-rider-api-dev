@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Location</title>
+</head>
+<body>
+  <h1>Share Rider Location</h1>
+  <div>
+    <label for="riderIdInput">Rider ID:</label>
+    <input id="riderIdInput" type="text" placeholder="Enter rider ID">
+  </div>
+  <div>
+    <label for="latitudeInput">Latitude:</label>
+    <input id="latitudeInput" type="text" placeholder="Enter latitude">
+  </div>
+  <div>
+    <label for="longitudeInput">Longitude:</label>
+    <input id="longitudeInput" type="text" placeholder="Enter longitude">
+  </div>
+  <button onclick="sendLocation()">Send Location</button>
+
+  <h2>Messages</h2>
+  <div id="messages"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io('http://localhost:8000');
+
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+    });
+
+    socket.on('locationUpdated', (location) => {
+      const messagesDiv = document.getElementById('messages');
+      const messageElement = document.createElement('div');
+      messageElement.textContent = `Rider ${location.riderId} is at (${location.latitude}, ${location.longitude})`;
+      messagesDiv.appendChild(messageElement);
+    });
+
+    function sendLocation() {
+      const riderIdInput = document.getElementById('riderIdInput');
+      const latitudeInput = document.getElementById('latitudeInput');
+      const longitudeInput = document.getElementById('longitudeInput');
+
+      const riderId = riderIdInput.value;
+      const latitude = parseFloat(latitudeInput.value);
+      const longitude = parseFloat(longitudeInput.value);
+
+      if (riderId && !isNaN(latitude) && !isNaN(longitude)) {
+        socket.emit('updateLocation', { riderId, latitude, longitude });
+        // riderIdInput.value = '';
+        // latitudeInput.value = '';
+        // longitudeInput.value = '';
+      } else {
+        alert('Please enter valid values for Rider ID, Latitude, and Longitude.');
+      }
+    }
+  </script>
+</body>
+</html>
