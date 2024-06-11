@@ -93,84 +93,43 @@ export class LocationService {
     }
   }
 
-  async saveLocation(
-    riderId: string,
+  async updateLocation(
+    riderId: number,
     latitude: number,
     longitude: number,
+    isActive?: boolean,
   ): Promise<Location> {
-    const location = new this.locationModel({
-      riderId: Number(riderId),
+    const updateData: any = {
       location: {
         type: 'Point',
         coordinates: [longitude, latitude],
       },
       updatedAt: new Date(),
-    });
-    return location.save();
-  }
+    };
 
-  async updateLocation(
-    riderId: number,
-    latitude: number,
-    longitude: number,
-  ): Promise<Location> {
+    if (isActive !== undefined) {
+      updateData.isActive = isActive;
+    }
+
     return this.locationModel
       .findOneAndUpdate(
         { riderId },
-        {
-          $set: {
-            location: {
-              type: 'Point',
-              coordinates: [longitude, latitude],
-            },
-            updatedAt: new Date(),
-          },
-        },
+        { $set: updateData },
         { new: true, upsert: true },
       )
       .exec();
   }
 
-  async getLocation(riderId: number): Promise<Location> {
+  async updateActiveStatus(
+    riderId: number,
+    isActive: boolean,
+  ): Promise<Location> {
     return this.locationModel
-      .findOne({ riderId })
-      .sort({ updatedAt: -1 })
+      .findOneAndUpdate(
+        { riderId },
+        { $set: { isActive: isActive, updatedAt: new Date() } },
+        { new: true, upsert: true },
+      )
       .exec();
-  }
-
-  async getNearbyRiders(
-    latitude: number,
-    longitude: number,
-    radius: number,
-  ): Promise<Location[]> {
-    console.log(
-      'Service: getNearbyRiders called with latitude:',
-      latitude,
-      'longitude:',
-      longitude,
-      'radius:',
-      radius,
-    );
-
-    try {
-      const results = await this.locationModel
-        .find({
-          location: {
-            $geoWithin: {
-              $centerSphere: [[longitude, latitude], radius / 6371], // radius converted to radians
-            },
-          },
-        })
-        .exec();
-
-      console.log(
-        'Service: Query successful, found locations:',
-        results.length,
-      );
-      return results;
-    } catch (error) {
-      console.error('Service: Error in getNearbyRiders:', error);
-      throw error;
-    }
   }
 }

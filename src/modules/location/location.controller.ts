@@ -24,6 +24,7 @@ import {
   GetLocationOfRiderSwagger,
   GetNearbyRidersSwagger,
   SimulateLocationsSwagger,
+  UpdateActiveStatusSwagger,
   UpdateLocationOfRiderSwagger,
 } from './decorators/swagger-decorators';
 import { LocationService } from './location.service';
@@ -32,16 +33,6 @@ import { LocationService } from './location.service';
 @Controller('locations')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
-
-  @UpdateLocationOfRiderSwagger()
-  @Put('rider/:riderId')
-  async updateLocation(
-    @Param('riderId') riderId: number,
-    @Body() updateLocationDto: { latitude: number; longitude: number },
-  ): Promise<Location> {
-    const { latitude, longitude } = updateLocationDto;
-    return this.locationService.updateLocation(riderId, latitude, longitude);
-  }
 
   @SimulateLocationsSwagger()
   @Post('start-simulation')
@@ -60,5 +51,38 @@ export class LocationController {
   })
   stopSimulation() {
     return this.locationService.stopSimulation();
+  }
+
+  @UpdateLocationOfRiderSwagger()
+  @Put('rider/update/:riderId')
+  async updateLocation(
+    @Param('riderId') riderId: number,
+    @Body()
+    updateLocationDto: {
+      latitude: number;
+      longitude: number;
+      isActive?: boolean;
+    },
+  ): Promise<Location> {
+    const { latitude, longitude, isActive } = updateLocationDto;
+    return this.locationService.updateLocation(
+      riderId,
+      latitude,
+      longitude,
+      isActive,
+    );
+  }
+
+  @UpdateActiveStatusSwagger()
+  @Put('rider/status/:riderId')
+  async updateActiveStatus(
+    @Param('riderId') riderId: number,
+    @Body()
+    updateActiveStatusDto: {
+      isActive: boolean;
+    },
+  ): Promise<Location> {
+    const { isActive } = updateActiveStatusDto;
+    return this.locationService.updateActiveStatus(riderId, isActive);
   }
 }

@@ -2,6 +2,7 @@ import { Schema, Document } from 'mongoose';
 
 export const LocationSchema = new Schema({
   riderId: { type: Number, unique: true, required: true },
+  isActive: { type: Boolean, default: true, required: false },
   location: {
     type: {
       type: String,
@@ -19,6 +20,7 @@ LocationSchema.index({ location: '2dsphere' });
 
 export interface Location extends Document {
   riderId: number;
+  isActive: boolean;
   location: {
     type: string;
     coordinates: number[];

@@ -77,10 +77,11 @@ export class NotificationsController {
     };
 
     // Send the notification to all riders
-    const response = await this.firebaseAdminService.sendNotification(
-      sendDeliveryRequestNotificationDto.tokens,
-      payload,
-    );
+    const response =
+      await this.firebaseAdminService.sendDeliveryRequestNotification(
+        sendDeliveryRequestNotificationDto.tokens,
+        payload,
+      );
 
     // Log or handle the response if needed
     console.log('FCM Response:', response);

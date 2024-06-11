@@ -8,6 +8,27 @@ import {
 } from '@nestjs/swagger';
 import { SetCoordinatesAndSimulateDto } from '../dtos/set-coordinates-and-simulate.dto';
 
+export function UpdateActiveStatusSwagger() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Update status of the rider' }),
+    ApiParam({
+      name: 'riderId',
+      description: 'ID of the rider',
+      example: 999001,
+    }),
+    ApiBody({
+      description: 'Set status',
+      schema: {
+        example: { isActive: true },
+      },
+    }),
+    ApiResponse({
+      status: 200,
+      description: "The rider's status has been successfully updated.",
+    }),
+  );
+}
+
 export function GetLocationOfRiderSwagger() {
   return applyDecorators(
     ApiOperation({ summary: 'Get location of a rider' }),
@@ -33,7 +54,9 @@ export function UpdateLocationOfRiderSwagger() {
     }),
     ApiBody({
       description: 'Location update data',
-      schema: { example: { latitude: 23.722, longitude: 90.4515 } },
+      schema: {
+        example: { latitude: 23.722, longitude: 90.4515, isActive: true },
+      },
     }),
     ApiResponse({
       status: 200,
