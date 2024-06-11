@@ -71,7 +71,7 @@
       }
       riderIdInput.value = riderId;
 
-      socket = io('http://localhost:8000');
+      socket = io('https://cgp-rider-api.onrender.com');
 
       socket.on('connect', () => {
         console.log('Connected to WebSocket server');

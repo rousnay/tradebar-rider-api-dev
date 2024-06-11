@@ -11,8 +11,7 @@ import { Logger } from '@nestjs/common';
   cors: true,
 })
 export class LocationGateway {
-  @WebSocketServer()
-  server: Server;
+  @WebSocketServer() server: Server;
   private logger: Logger = new Logger('LocationGateway');
 
   constructor(private readonly locationService: LocationService) {}
