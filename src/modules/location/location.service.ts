@@ -42,6 +42,7 @@ export class LocationService {
               type: 'Point',
               coordinates: [longitude, latitude],
             },
+            isActive: true,
             updatedAt: timestamp,
           },
         },

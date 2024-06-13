@@ -465,7 +465,7 @@ export class AuthService {
 
         //get rider data by user_id
         const rider = await this.riderRepository.findOne({
-          where: { user_id: user?.user_id },
+          where: { user_id: user?.id },
         });
 
         return {
