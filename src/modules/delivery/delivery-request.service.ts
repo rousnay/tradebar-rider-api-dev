@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UpdateDeliveryRequestDto } from './dtos/update-delivery-request.dto';
@@ -7,46 +12,63 @@ import {
   AssignedRider,
 } from './schemas/delivery-request.schema';
 import { DeliveryStatus } from '@common/enums/delivery.enum';
+import { REQUEST } from '@nestjs/core';
+import {
+  DeliveryRequestNotification,
+  DeliveryRequestNotificationModel,
+} from '@modules/notification/notification.schema';
 
 @Injectable()
 export class DeliveryRequestService {
   constructor(
+    @Inject(REQUEST) private readonly request: Request,
     @InjectModel(DeliveryRequest.name)
     private deliveryRequestModel: Model<DeliveryRequest>,
+    @InjectModel(DeliveryRequestNotificationModel.modelName)
+    private deliveryRequestNotificationModel: Model<DeliveryRequestNotification>,
   ) {}
 
   async findAll(): Promise<DeliveryRequest[]> {
-    return this.deliveryRequestModel.find().exec();
+    const userId = this.request['user'].user_id;
+    const notifications = await this.deliveryRequestNotificationModel
+      .find({ userId })
+      .exec();
+
+    const requestIds = notifications.map(
+      (notification) => notification?.data?.requestId,
+    );
+
+    return this.deliveryRequestModel.find({ _id: { $in: requestIds } }).exec();
   }
 
   async findOne(id: string): Promise<DeliveryRequest> {
     return this.deliveryRequestModel.findById(id).exec();
   }
 
-  async updateStatus(
-    id: string,
-    status: DeliveryStatus,
-  ): Promise<DeliveryRequest> {
-    return this.deliveryRequestModel
-      .findByIdAndUpdate(id, { status }, { new: true })
-      .exec();
-  }
+  async acceptDeliveryRequest(id: string, req: any): Promise<DeliveryRequest> {
+    const deliveryRequest = await this.deliveryRequestModel.findById(id).exec();
+    if (!deliveryRequest) {
+      throw new NotFoundException('Delivery request not found');
+    }
 
-  async updateAssignedRider(
-    id: string,
-    assignedRider: AssignedRider,
-  ): Promise<DeliveryRequest> {
-    return this.deliveryRequestModel
-      .findByIdAndUpdate(id, { assignedRider }, { new: true })
-      .exec();
-  }
+    if (deliveryRequest.status !== DeliveryStatus.SEARCHING) {
+      throw new BadRequestException(
+        'Delivery request is not in searching status',
+      );
+    }
 
-  async partialUpdate(
-    id: string,
-    updateData: UpdateDeliveryRequestDto,
-  ): Promise<DeliveryRequest> {
+    const rider = req.user;
+    console.log('Rider #:', rider);
+    const updateFields = {
+      status: DeliveryStatus.ACCEPTED,
+      assignedRider: {
+        id: rider.id,
+        name: `${rider.first_name} ${rider.last_name}`,
+      },
+    };
+
     return this.deliveryRequestModel
-      .findByIdAndUpdate(id, updateData, { new: true })
+      .findByIdAndUpdate(id, updateFields, { new: true })
       .exec();
   }
 }

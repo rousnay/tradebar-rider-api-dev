@@ -12,15 +12,21 @@ import {
 } from './schemas/delivery-request.schema';
 import { DeliveryRequestService } from './delivery-request.service';
 import { DeliveryRequestController } from './delivery-request.controller';
+import { NotificationsModule } from '@modules/notification/notification.module';
+import { DeliveryRequestNotificationSchema } from '@modules/notification/notification.schema';
 
 @Module({
   imports: [
     LocationModule,
+    NotificationsModule,
     TypeOrmModule.forFeature([DeliveryRequest]),
     MongooseModule.forFeature([
       { name: DeliveryRequest.name, schema: DeliveryRequestSchema },
+      {
+        name: 'DeliveryRequestNotification',
+        schema: DeliveryRequestNotificationSchema,
+      },
     ]),
-    // MongooseModule.forFeature([{ name: 'Location', schema: LocationSchema }]),
   ],
   exports: [DeliveryService, DeliveryRequestService],
   providers: [DeliveryService, DeliveryRequestService],

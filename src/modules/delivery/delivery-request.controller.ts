@@ -9,6 +9,8 @@ import {
   Patch,
   HttpException,
   HttpStatus,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,10 +18,13 @@ import {
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { DeliveryRequestService } from './delivery-request.service';
 import { UpdateDeliveryRequestDto } from './dtos/update-delivery-request.dto';
 import { DeliveryRequest } from './schemas/delivery-request.schema';
+import { JwtAuthGuard } from '@core/guards/jwt-auth.guard';
+import { UpdateStatusDto } from './dtos/update-status.dto';
 
 @ApiTags('Delivery Requests')
 @Controller('delivery-requests')
@@ -29,6 +34,8 @@ export class DeliveryRequestController {
   ) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
   @ApiOperation({ summary: 'Get all delivery requests' })
   @ApiResponse({
     status: 200,
@@ -49,6 +56,8 @@ export class DeliveryRequestController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
   @ApiOperation({ summary: 'Get a delivery request by ID' })
   @ApiParam({ name: 'id', description: 'The ID of the delivery request' })
   @ApiResponse({
@@ -68,38 +77,33 @@ export class DeliveryRequestController {
     };
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Partially update a delivery request by ID' })
-  @ApiParam({ name: 'id', description: 'The ID of the delivery request' })
+  @Patch('accept/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
+  @ApiOperation({ summary: 'Update a delivery request' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the delivery request',
+    required: true,
+  })
   @ApiResponse({
     status: 200,
-    description: 'The delivery request has been successfully updated.',
+    description: 'The updated delivery request',
     type: DeliveryRequest,
   })
   @ApiResponse({ status: 404, description: 'Delivery request not found' })
-  @ApiBody({ type: UpdateDeliveryRequestDto })
-  async partialUpdate(
+  async acceptDeliveryRequest(
     @Param('id') id: string,
-    @Body() updateDeliveryRequestDto: UpdateDeliveryRequestDto,
+    @Request() req,
   ): Promise<{ status: string; message: string; data: DeliveryRequest }> {
-    if (updateDeliveryRequestDto.status) {
-      await this.deliveryRequestService.updateStatus(
-        id,
-        updateDeliveryRequestDto.status,
-      );
-    }
-    if (updateDeliveryRequestDto.assignedRider) {
-      await this.deliveryRequestService.updateAssignedRider(
-        id,
-        updateDeliveryRequestDto.assignedRider,
-      );
-    }
-    const request = await this.deliveryRequestService.findOne(id);
-
+    const updatedData = await this.deliveryRequestService.acceptDeliveryRequest(
+      id,
+      req,
+    );
     return {
       status: 'success',
-      message: 'The delivery request has been successfully updated.',
-      data: request,
+      message: 'Delivery request accepted.',
+      data: updatedData,
     };
   }
 }
