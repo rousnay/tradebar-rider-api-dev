@@ -9,7 +9,8 @@ import { LocationSchema } from './schemas/location.schema';
   imports: [
     MongooseModule.forFeature([{ name: 'Location', schema: LocationSchema }]),
   ],
-  controllers: [LocationController],
   providers: [LocationService, LocationGateway],
+  exports: [LocationService],
+  controllers: [LocationController],
 })
 export class LocationModule {}

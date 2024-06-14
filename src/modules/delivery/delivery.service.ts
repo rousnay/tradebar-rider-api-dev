@@ -1,82 +1,64 @@
 import { Injectable } from '@nestjs/common';
-import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager, getConnection } from 'typeorm';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Delivery } from './models/delivery.model';
+import { LocationService } from '@modules/location/location.service';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class DeliveryService {
   constructor(
-    @InjectEntityManager() private readonly entityManager: EntityManager,
-    @InjectModel('Delivery') private readonly deliveryModel: Model<Delivery>,
+    private readonly entityManager: EntityManager,
+    private locationService: LocationService,
   ) {}
 
-  async getDeliveryRequests(): Promise<Delivery[]> {
-    try {
-      return await this.deliveryModel.find().exec();
-    } catch (error) {
-      throw new Error(`Error fetching delivery requests: ${error.message}`);
+  async getRiderDeviceTokens(
+    riderIds: number[],
+  ): Promise<{ riderId: number; deviceTokens: string[] }[]> {
+    const userIdQuery = `
+      SELECT id AS riderId, user_id AS userId
+      FROM riders
+      WHERE id IN (${riderIds.join(',')})
+    `;
+
+    const userMappings = await this.entityManager.query(userIdQuery);
+    console.log('userMappings', userMappings);
+
+    const userIds = userMappings.map((mapping) => mapping.userId);
+
+    if (userIds.length === 0) {
+      return [];
     }
-  }
+    console.log('userIds', userIds);
 
-  async getDeliveryRequestById(id: number): Promise<Delivery> {
-    try {
-      return await this.deliveryModel.findById(id).exec();
-    } catch (error) {
-      throw new Error(`Error fetching delivery request: ${error.message}`);
-    }
-  }
+    const deviceTokensQuery = `
+      SELECT user_id AS userId, device_token AS deviceToken
+      FROM user_device_tokens
+      WHERE user_id IN (${userIds.join(',')})
+    `;
 
-  // async acceptDeliveryRequest(id: number): Promise<any> {
-  //   try {
-  //     return await this.entityManager.query(
-  //       `UPDATE deliveries SET shipping_status = 'accepted' WHERE id = ${id}`,
-  //     );
-  //   } catch (error) {
-  //     throw new Error(`Error accepting delivery request: ${error.message}`);
-  //   }
-  // }
+    const deviceTokensMappings = await this.entityManager.query(
+      deviceTokensQuery,
+    );
 
-  async acceptDeliveryRequest(id: number): Promise<any> {
-    console.log('Service: acceptDeliveryRequest called with id:', id);
-    try {
-      const updateResult = await this.entityManager.query(
-        `UPDATE deliveries SET shipping_status = 'accepted' WHERE id = 4`,
-        [id],
-      );
+    console.log('deviceTokensQuery', deviceTokensQuery);
 
-      console.log('Update Result:', updateResult);
+    const userDeviceTokensMap = deviceTokensMappings.reduce((acc, token) => {
+      if (!acc[token.userId]) {
+        acc[token.userId] = [];
+      }
+      if (!acc[token.userId].includes(token.deviceToken)) {
+        acc[token.userId].push(token.deviceToken);
+      }
+      return acc;
+    }, {});
 
-      // // Perform the update and log the result
-      // const updateResult = await this.entityManager
-      //   .createQueryBuilder()
-      //   .update('deliveries')
-      //   .set({ shipping_status: 'accepted' })
-      //   .where('id = :id', { id })
-      //   .execute();
+    console.log('userDeviceTokensMap', userDeviceTokensMap);
 
-      // console.log('Update Result:', updateResult);
+    const riderDeviceTokens = userMappings.map((mapping) => ({
+      riderId: mapping.riderId,
+      deviceTokens: userDeviceTokensMap[mapping.userId] || [],
+    }));
 
-      // // Retrieve the updated row
-      // const updatedRow = await this.entityManager
-      //   .createQueryBuilder('deliveries')
-      //   .where('id = :id', { id })
-      //   .getOne();
+    console.log('riderDeviceTokens', riderDeviceTokens);
 
-      // console.log('Updated Row:', updatedRow);
-
-      // return updatedRow;
-
-      // Retrieve the updated row
-      const updatedRow = await this.entityManager.query(
-        `SELECT * FROM deliveries WHERE id = ?`,
-        [id],
-      );
-
-      return updatedRow[0];
-    } catch (error) {
-      throw new Error(`Error accepting delivery request: ${error.message}`);
-    }
+    return riderDeviceTokens;
   }
 }

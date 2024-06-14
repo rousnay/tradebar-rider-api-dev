@@ -1,9 +1,10 @@
 import { Document, Model, model } from 'mongoose';
 import { DeliverySchema } from '../schemas/delivery.schema';
-import { ShippingStatus, DeliveryType } from '@common/enums/delivery.enum';
+import { ShippingStatus } from '@common/enums/delivery.enum';
+import { OrderType } from '@common/enums/order.enum';
 
 export interface Delivery extends Document {
-  delivery_type: DeliveryType;
+  order_type: OrderType;
   shipping_status: ShippingStatus;
   order_id?: number;
   customer?: object;

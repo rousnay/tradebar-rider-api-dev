@@ -1,11 +1,12 @@
 import { Schema } from 'mongoose';
-import { ShippingStatus, DeliveryType } from '@common/enums/delivery.enum';
+import { ShippingStatus } from '@common/enums/delivery.enum';
+import { OrderType } from '@common/enums/order.enum';
 
 export const DeliverySchema = new Schema(
   {
     delivery_type: {
       type: String,
-      enum: DeliveryType,
+      enum: OrderType,
       required: false,
     },
     shipping_status: {
