@@ -51,11 +51,11 @@ export class DeliveryRequestService {
       throw new NotFoundException('Delivery request not found');
     }
 
-    if (deliveryRequest.status !== DeliveryStatus.SEARCHING) {
-      throw new BadRequestException(
-        'Delivery request is not in searching status',
-      );
-    }
+    // if (deliveryRequest.status !== DeliveryStatus.SEARCHING) {
+    //   throw new BadRequestException(
+    //     'Delivery request is not in searching status',
+    //   );
+    // }
 
     const rider = req.user;
     console.log('Rider #:', rider);
