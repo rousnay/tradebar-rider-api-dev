@@ -1,29 +1,30 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Param,
-  Put,
-  Delete,
   Patch,
-  HttpException,
-  HttpStatus,
   UseGuards,
   Request,
+  Put,
+  Body,
+  NotFoundException,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
-  ApiBody,
   ApiBearerAuth,
+  ApiNotFoundResponse,
+  ApiBody,
+  ApiQuery,
+  ApiProperty,
 } from '@nestjs/swagger';
 import { DeliveryRequestService } from './delivery-request.service';
-import { UpdateDeliveryRequestDto } from './dtos/update-delivery-request.dto';
 import { DeliveryRequest } from './schemas/delivery-request.schema';
 import { JwtAuthGuard } from '@core/guards/jwt-auth.guard';
+import { ShippingStatus } from '@common/enums/delivery.enum';
 import { UpdateStatusDto } from './dtos/update-status.dto';
 
 @ApiTags('Delivery Requests')
@@ -77,7 +78,7 @@ export class DeliveryRequestController {
     };
   }
 
-  @Patch('accept/:id')
+  @Patch('accept/:id/:vehicleId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access_token')
   @ApiOperation({ summary: 'Update a delivery request' })
@@ -93,17 +94,50 @@ export class DeliveryRequestController {
   })
   @ApiResponse({ status: 404, description: 'Delivery request not found' })
   async acceptDeliveryRequest(
-    @Param('id') id: string,
     @Request() req,
+    @Param('id') id: string,
+    @Param('vehicleId') vehicleId: number,
   ): Promise<{ status: string; message: string; data: DeliveryRequest }> {
+    console.log('vehicleId', vehicleId);
     const updatedData = await this.deliveryRequestService.acceptDeliveryRequest(
-      id,
       req,
+      id,
+      vehicleId,
     );
     return {
       status: 'success',
       message: 'Delivery request accepted.',
       data: updatedData,
     };
+  }
+
+  @Put('status/:id')
+  @ApiOperation({ summary: 'Update delivery request status' })
+  @ApiResponse({ status: 200, description: 'Updated successfully' })
+  @ApiNotFoundResponse({ description: 'Delivery request not found' })
+  // @ApiBody({ type: UpdateStatusDto })
+  @ApiQuery({
+    name: 'status',
+    required: false, // Make it optional (if needed)
+    enum: ShippingStatus, // Reference the enum
+    description: 'Filter shipments by their status',
+  })
+  @ApiProperty({ enum: ShippingStatus, description: 'Shipping status' })
+  async updateDeliveryRequestStatus(
+    @Request() req,
+    @Param('id') id: string,
+    @Query('status') status?: ShippingStatus,
+    // @Body('status') status: ShippingStatus,
+  ): Promise<DeliveryRequest> {
+    const updatedDeliveryRequest =
+      await this.deliveryRequestService.updateDeliveryRequestStatus(
+        req,
+        id,
+        status,
+      );
+    if (!updatedDeliveryRequest) {
+      throw new NotFoundException('Delivery request not found');
+    }
+    return updatedDeliveryRequest;
   }
 }

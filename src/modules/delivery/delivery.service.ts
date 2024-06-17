@@ -1,11 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { LocationService } from '@modules/location/location.service';
 import { EntityManager } from 'typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { DeliveryRequest } from './schemas/delivery-request.schema';
+import { Model } from 'mongoose';
+import { ShippingStatus } from '@common/enums/delivery.enum';
 
 @Injectable()
 export class DeliveryService {
   constructor(
     private readonly entityManager: EntityManager,
+    @InjectModel(DeliveryRequest.name)
+    private deliveryRequestModel: Model<DeliveryRequest>,
     private locationService: LocationService,
   ) {}
 

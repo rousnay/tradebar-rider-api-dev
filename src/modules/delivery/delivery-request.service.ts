@@ -1,17 +1,9 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { EntityManager } from 'typeorm';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UpdateDeliveryRequestDto } from './dtos/update-delivery-request.dto';
-import {
-  DeliveryRequest,
-  AssignedRider,
-} from './schemas/delivery-request.schema';
-import { DeliveryStatus } from '@common/enums/delivery.enum';
+import { DeliveryRequest } from './schemas/delivery-request.schema';
+import { ShippingStatus } from '@common/enums/delivery.enum';
 import { REQUEST } from '@nestjs/core';
 import {
   DeliveryRequestNotification,
@@ -22,6 +14,7 @@ import {
 export class DeliveryRequestService {
   constructor(
     @Inject(REQUEST) private readonly request: Request,
+    private readonly entityManager: EntityManager,
     @InjectModel(DeliveryRequest.name)
     private deliveryRequestModel: Model<DeliveryRequest>,
     @InjectModel(DeliveryRequestNotificationModel.modelName)
@@ -45,7 +38,13 @@ export class DeliveryRequestService {
     return this.deliveryRequestModel.findById(id).exec();
   }
 
-  async acceptDeliveryRequest(id: string, req: any): Promise<DeliveryRequest> {
+  async acceptDeliveryRequest(
+    req: any,
+    id: string,
+    vehicleId: number,
+  ): Promise<DeliveryRequest> {
+    const selectedVehicleId = Number(vehicleId || 0);
+
     const deliveryRequest = await this.deliveryRequestModel.findById(id).exec();
     if (!deliveryRequest) {
       throw new NotFoundException('Delivery request not found');
@@ -59,13 +58,75 @@ export class DeliveryRequestService {
 
     const rider = req.user;
     console.log('Rider #:', rider);
+
     const updateFields = {
-      status: DeliveryStatus.ACCEPTED,
+      status: ShippingStatus.ACCEPTED,
       assignedRider: {
         id: rider.id,
         name: `${rider.first_name} ${rider.last_name}`,
+        vehicleId: selectedVehicleId,
       },
     };
+
+    const updateShippingQuery = `
+      UPDATE deliveries
+      SET shipping_status = ?,
+          rider_id = ?,
+          vehicle_id = ?
+      WHERE id = ?
+    `;
+
+    try {
+      await this.entityManager.query(updateShippingQuery, [
+        ShippingStatus.ACCEPTED,
+        rider.id,
+        selectedVehicleId,
+        deliveryRequest.deliveryId,
+      ]);
+
+      console.log('ShippingStatus Update successful');
+    } catch (error) {
+      console.error('Error updating shipping status:', error);
+    }
+
+    return this.deliveryRequestModel
+      .findByIdAndUpdate(id, updateFields, { new: true })
+      .exec();
+  }
+
+  async updateDeliveryRequestStatus(
+    req: any,
+    id: string,
+    status: ShippingStatus,
+  ): Promise<DeliveryRequest> {
+    const deliveryRequest = await this.deliveryRequestModel.findById(id).exec();
+    if (!deliveryRequest) {
+      throw new NotFoundException('Delivery request not found');
+    }
+
+    const rider = req.user;
+    console.log('Rider #:', rider);
+
+    const updateFields = {
+      status: status,
+    };
+
+    const updateShippingQuery = `
+      UPDATE deliveries
+      SET shipping_status = ?
+      WHERE id = ?
+    `;
+
+    try {
+      await this.entityManager.query(updateShippingQuery, [
+        status,
+        deliveryRequest.deliveryId,
+      ]);
+
+      console.log('ShippingStatus Update successful');
+    } catch (error) {
+      console.error('Error updating shipping status:', error);
+    }
 
     return this.deliveryRequestModel
       .findByIdAndUpdate(id, updateFields, { new: true })
