@@ -115,11 +115,10 @@ export class DeliveryRequestController {
   @ApiOperation({ summary: 'Update delivery request status' })
   @ApiResponse({ status: 200, description: 'Updated successfully' })
   @ApiNotFoundResponse({ description: 'Delivery request not found' })
-  // @ApiBody({ type: UpdateStatusDto })
   @ApiQuery({
     name: 'status',
-    required: false, // Make it optional (if needed)
-    enum: ShippingStatus, // Reference the enum
+    required: false,
+    enum: ShippingStatus,
     description: 'Filter shipments by their status',
   })
   @ApiProperty({ enum: ShippingStatus, description: 'Shipping status' })
@@ -127,8 +126,7 @@ export class DeliveryRequestController {
     @Request() req,
     @Param('id') id: string,
     @Query('status') status?: ShippingStatus,
-    // @Body('status') status: ShippingStatus,
-  ): Promise<DeliveryRequest> {
+  ): Promise<{ status: string; message: string; data: DeliveryRequest }> {
     const updatedDeliveryRequest =
       await this.deliveryRequestService.updateDeliveryRequestStatus(
         req,
@@ -138,6 +136,11 @@ export class DeliveryRequestController {
     if (!updatedDeliveryRequest) {
       throw new NotFoundException('Delivery request not found');
     }
-    return updatedDeliveryRequest;
+
+    return {
+      status: 'success',
+      message: 'Delivery status updated.',
+      data: updatedDeliveryRequest,
+    };
   }
 }

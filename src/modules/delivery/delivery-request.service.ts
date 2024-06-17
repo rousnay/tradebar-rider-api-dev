@@ -9,6 +9,7 @@ import {
   DeliveryRequestNotification,
   DeliveryRequestNotificationModel,
 } from '@modules/notification/notification.schema';
+import { DeliveryNotificationService } from './delivery.notification.service';
 
 @Injectable()
 export class DeliveryRequestService {
@@ -19,6 +20,7 @@ export class DeliveryRequestService {
     private deliveryRequestModel: Model<DeliveryRequest>,
     @InjectModel(DeliveryRequestNotificationModel.modelName)
     private deliveryRequestNotificationModel: Model<DeliveryRequestNotification>,
+    private deliveryNotificationService: DeliveryNotificationService,
   ) {}
 
   async findAll(): Promise<DeliveryRequest[]> {
@@ -89,6 +91,12 @@ export class DeliveryRequestService {
       console.error('Error updating shipping status:', error);
     }
 
+    //sent notifications
+    await this.deliveryNotificationService.sendDeliveryStatusNotification(
+      deliveryRequest,
+      ShippingStatus.ACCEPTED,
+    );
+
     return this.deliveryRequestModel
       .findByIdAndUpdate(id, updateFields, { new: true })
       .exec();
@@ -127,6 +135,12 @@ export class DeliveryRequestService {
     } catch (error) {
       console.error('Error updating shipping status:', error);
     }
+
+    //sent notifications
+    await this.deliveryNotificationService.sendDeliveryStatusNotification(
+      deliveryRequest,
+      status,
+    );
 
     return this.deliveryRequestModel
       .findByIdAndUpdate(id, updateFields, { new: true })

@@ -14,6 +14,7 @@ import { DeliveryRequestService } from './delivery-request.service';
 import { DeliveryRequestController } from './delivery-request.controller';
 import { NotificationsModule } from '@modules/notification/notification.module';
 import { DeliveryRequestNotificationSchema } from '@modules/notification/notification.schema';
+import { DeliveryNotificationService } from './delivery.notification.service';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { DeliveryRequestNotificationSchema } from '@modules/notification/notific
     ]),
   ],
   exports: [DeliveryService, DeliveryRequestService],
-  providers: [DeliveryService, DeliveryRequestService],
+  providers: [DeliveryService, DeliveryRequestService, DeliveryNotificationService],
   controllers: [DeliveryController, DeliveryRequestController],
 })
 export class DeliveryModule {}
