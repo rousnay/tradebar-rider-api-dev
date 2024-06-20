@@ -112,6 +112,8 @@ export class DeliveryRequestController {
   }
 
   @Put('status/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
   @ApiOperation({ summary: 'Update delivery request status' })
   @ApiResponse({ status: 200, description: 'Updated successfully' })
   @ApiNotFoundResponse({ description: 'Delivery request not found' })
