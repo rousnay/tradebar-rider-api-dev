@@ -73,6 +73,7 @@ export class DeliveryRequestService {
     const updateShippingQuery = `
       UPDATE deliveries
       SET shipping_status = ?,
+      SET accepted_at = ?,
           rider_id = ?,
           vehicle_id = ?
       WHERE id = ?
@@ -81,6 +82,7 @@ export class DeliveryRequestService {
     try {
       await this.entityManager.query(updateShippingQuery, [
         ShippingStatus.ACCEPTED,
+        new Date(),
         rider.id,
         selectedVehicleId,
         deliveryRequest.deliveryId,
@@ -113,23 +115,49 @@ export class DeliveryRequestService {
     }
 
     const rider = req.user;
-    console.log('Rider #:', rider);
+    // console.log('Rider #:', rider);
 
     const updateFields = {
       status: status,
     };
 
-    const updateShippingQuery = `
+    const theDate = new Date();
+    let timestampField = '';
+
+    if (status === ShippingStatus.ACCEPTED) {
+      timestampField = 'accepted_at';
+    } else if (status === ShippingStatus.REACHED_AT_PICKUP_POINT) {
+      timestampField = 'reached_pickup_point_at';
+    } else if (status === ShippingStatus.PICKED_UP) {
+      timestampField = 'picked_up_at';
+    } else if (status === ShippingStatus.REACHED_AT_DELIVERY_POINT) {
+      timestampField = 'reached_delivery_point_at';
+    } else if (status === ShippingStatus.DELIVERED) {
+      timestampField = 'delivered_at';
+    } else if (status === ShippingStatus.CANCELLED) {
+      timestampField = 'cancelled_at';
+    }
+
+    let updateShippingQuery = `
       UPDATE deliveries
       SET shipping_status = ?
-      WHERE id = ?
     `;
 
+    const queryParams: (ShippingStatus | Date | number)[] = [status];
+
+    if (timestampField) {
+      updateShippingQuery += `, ${timestampField} = ?`;
+      queryParams.push(theDate);
+    }
+
+    updateShippingQuery += ' WHERE id = ? AND rider_id = ?';
+    queryParams.push(deliveryRequest.deliveryId, rider.id);
+
+    console.log('updateShippingQuery', updateShippingQuery);
+    console.log('queryParams', queryParams);
+
     try {
-      await this.entityManager.query(updateShippingQuery, [
-        status,
-        deliveryRequest.deliveryId,
-      ]);
+      await this.entityManager.query(updateShippingQuery, queryParams);
 
       console.log('ShippingStatus Update successful');
     } catch (error) {
