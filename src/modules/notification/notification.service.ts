@@ -46,7 +46,50 @@ export class NotificationService {
 
     console.log('FCM Data:', fcmData);
 
-    const fcmMessageId = await this.firebaseAdminService.sendNotification(
+    let fcmMessageIds = [];
+
+    try {
+      fcmMessageIds = await Promise.all(
+        deviceTokens.map(async (deviceToken) => {
+          return await this.firebaseAdminService.sendNotification(
+            deviceToken,
+            title,
+            message,
+            fcmData,
+          );
+        }),
+      );
+    } catch (error) {
+      console.error('Error sending FCM notifications:', error);
+    }
+
+    return { fcmMessageIds, notificationId };
+  }
+
+  async sendAndStoreMulticastMessage(
+    userId: number,
+    deviceTokens: string[],
+    title: string,
+    message: string,
+    data: { [key: string]: string },
+  ) {
+    const notification = await this.createNotification(
+      userId,
+      deviceTokens,
+      title,
+      message,
+      data,
+    );
+    const notificationId = notification._id.toString();
+
+    const fcmData = {
+      id: notificationId,
+      ...data,
+    };
+
+    console.log('FCM Data:', fcmData);
+
+    const fcmMessageId = await this.firebaseAdminService.sendMulticastMessage(
       deviceTokens,
       title,
       message,

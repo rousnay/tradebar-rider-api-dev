@@ -21,11 +21,38 @@ export class FirebaseAdminService {
   }
 
   async sendNotification(
+    token: string,
+    title: string,
+    message: string,
+    data: { [key: string]: string },
+  ): Promise<any> {
+    const payload = {
+      notification: {
+        title: title,
+        body: message,
+      },
+      data: data,
+    };
+
+    try {
+      const response = await admin.messaging().send({
+        token: token,
+        ...payload,
+      });
+      console.log('Successfully sent message:', response);
+      // Extract the message ID from the response
+      const messageId = response.split('/').pop();
+      return messageId;
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  }
+
+  async sendMulticastMessage(
     tokens: string[],
     title: string,
     message: string,
     data: { [key: string]: string },
-    // payload: admin.messaging.MessagingPayload,
   ): Promise<admin.messaging.BatchResponse> {
     const payload = {
       notification: {
@@ -42,18 +69,6 @@ export class FirebaseAdminService {
       };
 
       return await this.app.messaging().sendEachForMulticast(messageData);
-      // Mocking the response
-      // const response = {
-      //   successCount: tokens.length,
-      //   failureCount: 0,
-      //   responses: tokens.map((token) => ({
-      //     success: true,
-      //     messageId: `mock_message_id_${token}`,
-      //   })),
-      // };
-
-      // console.log('Mocked FCM Response:', response);
-      // return response as admin.messaging.BatchResponse;
     } catch (error) {
       console.error('Error sending message:', error);
     }

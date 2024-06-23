@@ -36,7 +36,7 @@ export class NotificationsController {
       status: 'success',
       message: 'Delivery request notifications sent and stored',
       data: {
-        fcmMessageId: result.fcmMessageId,
+        fcmMessageIds: result.fcmMessageIds,
         notificationId: result.notificationId,
       },
     };
