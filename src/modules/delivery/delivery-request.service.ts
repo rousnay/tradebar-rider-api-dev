@@ -73,9 +73,9 @@ export class DeliveryRequestService {
     const updateShippingQuery = `
       UPDATE deliveries
       SET shipping_status = ?,
-      SET accepted_at = ?,
-          rider_id = ?,
-          vehicle_id = ?
+      accepted_at = ?,
+      rider_id = ?,
+      vehicle_id = ?
       WHERE id = ?
     `;
 
