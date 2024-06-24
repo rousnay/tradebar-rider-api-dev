@@ -79,8 +79,6 @@ export class DeliveryRequestService {
       WHERE id = ?
     `;
 
-
-
     const updateOrderQuery = `
       UPDATE orders
       SET order_status = ?,
@@ -144,14 +142,66 @@ export class DeliveryRequestService {
       timestampField = 'accepted_at';
     } else if (status === ShippingStatus.REACHED_AT_PICKUP_POINT) {
       timestampField = 'reached_pickup_point_at';
+
+      const updateOrderQuery = `
+      UPDATE orders
+      SET order_status = ?,
+      accepted_at = ?,
+      WHERE id = ?
+    `;
+
+      await this.entityManager.query(updateOrderQuery, [
+        'processing',
+        new Date(),
+        deliveryRequest.orderId,
+      ]);
     } else if (status === ShippingStatus.PICKED_UP) {
       timestampField = 'picked_up_at';
+
+      const updateOrderQuery = `
+      UPDATE orders
+      SET order_status = ?,
+      accepted_at = ?,
+      WHERE id = ?
+    `;
+
+      await this.entityManager.query(updateOrderQuery, [
+        'in-transit',
+        new Date(),
+        deliveryRequest.orderId,
+      ]);
     } else if (status === ShippingStatus.REACHED_AT_DELIVERY_POINT) {
       timestampField = 'reached_delivery_point_at';
     } else if (status === ShippingStatus.DELIVERED) {
       timestampField = 'delivered_at';
+
+      const updateOrderQuery = `
+      UPDATE orders
+      SET order_status = ?,
+      accepted_at = ?,
+      WHERE id = ?
+    `;
+
+      await this.entityManager.query(updateOrderQuery, [
+        'delivered',
+        new Date(),
+        deliveryRequest.orderId,
+      ]);
     } else if (status === ShippingStatus.CANCELLED) {
       timestampField = 'cancelled_at';
+
+      const updateOrderQuery = `
+      UPDATE orders
+      SET order_status = ?,
+      accepted_at = ?,
+      WHERE id = ?
+    `;
+
+      await this.entityManager.query(updateOrderQuery, [
+        'cancelled',
+        new Date(),
+        deliveryRequest.orderId,
+      ]);
     }
 
     let updateShippingQuery = `
