@@ -70,39 +70,54 @@ export class DeliveryRequestService {
       },
     };
 
-    const updateShippingQuery = `
+    const updateDeliveryQuery = `
       UPDATE deliveries
       SET shipping_status = ?,
-      accepted_at = ?,
-      rider_id = ?,
-      vehicle_id = ?
+        accepted_at = ?,
+        rider_id = ?,
+        vehicle_id = ?
       WHERE id = ?
     `;
 
     const updateOrderQuery = `
       UPDATE orders
-      SET order_status = ?,
-      accepted_at = ?,
-      WHERE id = ?
+      SET order_status = 'accepted',
+        accepted_at = ?
+      WHERE id = (SELECT order_id FROM deliveries WHERE id = ?)
     `;
 
     try {
-      await this.entityManager.query(updateShippingQuery, [
-        ShippingStatus.ACCEPTED,
-        new Date(),
-        rider.id,
-        selectedVehicleId,
-        deliveryRequest.deliveryId,
-      ]);
+      await this.entityManager.transaction(
+        async (transactionalEntityManager) => {
+          await transactionalEntityManager.query(updateDeliveryQuery, [
+            ShippingStatus.ACCEPTED,
+            new Date(),
+            rider.id,
+            selectedVehicleId,
+            deliveryRequest.deliveryId,
+          ]);
+
+          await transactionalEntityManager.query(updateOrderQuery, [
+            new Date(),
+            deliveryRequest.deliveryId,
+          ]);
+        },
+      );
+
+      // await this.entityManager.query(updateShippingQuery, [
+      //   ShippingStatus.ACCEPTED,
+      //   new Date(),
+      //   rider.id,
+      //   selectedVehicleId,
+      //   deliveryRequest.deliveryId,
+      // ]);
+      // console.log('ShippingStatus Update successful');
+
+      // await transactionalEntityManager.query(updateOrderQuery, [
+      //   deliveryRequest.deliveryId,
+      // ]);
+
       console.log('ShippingStatus Update successful');
-
-      await this.entityManager.query(updateOrderQuery, [
-        'accepted',
-        new Date(),
-        deliveryRequest.orderId,
-      ]);
-
-      console.log('OrderStatus Update successful');
     } catch (error) {
       console.error('Error updating shipping status:', error);
     }
@@ -137,77 +152,35 @@ export class DeliveryRequestService {
 
     const theDate = new Date();
     let timestampField = '';
+    let orderStatus = '';
+    let orderAcceptedDate: Date | null = null;
+    let orderCancelledDate: Date | null = null;
 
     if (status === ShippingStatus.ACCEPTED) {
       timestampField = 'accepted_at';
+      orderStatus = 'accepted';
+      orderAcceptedDate = theDate;
     } else if (status === ShippingStatus.REACHED_AT_PICKUP_POINT) {
       timestampField = 'reached_pickup_point_at';
-
-      const updateOrderQuery = `
-      UPDATE orders
-      SET order_status = ?,
-      accepted_at = ?,
-      WHERE id = ?
-    `;
-
-      await this.entityManager.query(updateOrderQuery, [
-        'processing',
-        new Date(),
-        deliveryRequest.orderId,
-      ]);
+      orderStatus = 'processing';
     } else if (status === ShippingStatus.PICKED_UP) {
       timestampField = 'picked_up_at';
-
-      const updateOrderQuery = `
-      UPDATE orders
-      SET order_status = ?,
-      accepted_at = ?,
-      WHERE id = ?
-    `;
-
-      await this.entityManager.query(updateOrderQuery, [
-        'in-transit',
-        new Date(),
-        deliveryRequest.orderId,
-      ]);
+      orderStatus = 'in_transit';
     } else if (status === ShippingStatus.REACHED_AT_DELIVERY_POINT) {
       timestampField = 'reached_delivery_point_at';
     } else if (status === ShippingStatus.DELIVERED) {
       timestampField = 'delivered_at';
-
-      const updateOrderQuery = `
-      UPDATE orders
-      SET order_status = ?,
-      accepted_at = ?,
-      WHERE id = ?
-    `;
-
-      await this.entityManager.query(updateOrderQuery, [
-        'delivered',
-        new Date(),
-        deliveryRequest.orderId,
-      ]);
+      orderStatus = 'delivered';
     } else if (status === ShippingStatus.CANCELLED) {
       timestampField = 'cancelled_at';
-
-      const updateOrderQuery = `
-      UPDATE orders
-      SET order_status = ?,
-      accepted_at = ?,
-      WHERE id = ?
-    `;
-
-      await this.entityManager.query(updateOrderQuery, [
-        'cancelled',
-        new Date(),
-        deliveryRequest.orderId,
-      ]);
+      orderStatus = 'cancelled';
+      orderCancelledDate = theDate;
     }
 
     let updateShippingQuery = `
-      UPDATE deliveries
-      SET shipping_status = ?
-    `;
+  UPDATE deliveries
+  SET shipping_status = ?
+`;
 
     const queryParams: (ShippingStatus | Date | number)[] = [status];
 
@@ -219,15 +192,51 @@ export class DeliveryRequestService {
     updateShippingQuery += ' WHERE id = ? AND rider_id = ?';
     queryParams.push(deliveryRequest.deliveryId, rider.id);
 
-    console.log('updateShippingQuery', updateShippingQuery);
-    console.log('queryParams', queryParams);
+    // Construct the updateOrderQuery based on the presence of accepted_at and cancelled_at
+    let updateOrderQuery = `
+  UPDATE orders
+  SET order_status = ?
+`;
+    const orderQueryParams: (string | Date | number)[] = [orderStatus];
+
+    if (orderAcceptedDate) {
+      updateOrderQuery += `, accepted_at = ?`;
+      orderQueryParams.push(orderAcceptedDate);
+    }
+
+    if (orderCancelledDate) {
+      updateOrderQuery += `, cancelled_at = ?`;
+      orderQueryParams.push(orderCancelledDate);
+    }
+
+    updateOrderQuery += ` WHERE id = (SELECT order_id FROM deliveries WHERE id = ?)`;
+    orderQueryParams.push(deliveryRequest.deliveryId);
+
+    // console.log('updateShippingQuery', updateShippingQuery);
+    // console.log('queryParams', queryParams);
+    // console.log('updateOrderQuery', updateOrderQuery);
+    // console.log('orderQueryParams', orderQueryParams);
 
     try {
-      await this.entityManager.query(updateShippingQuery, queryParams);
+      await this.entityManager.transaction(
+        async (transactionalEntityManager) => {
+          await transactionalEntityManager.query(
+            updateShippingQuery,
+            queryParams,
+          );
 
-      console.log('ShippingStatus Update successful');
+          if (orderStatus) {
+            await transactionalEntityManager.query(
+              updateOrderQuery,
+              orderQueryParams,
+            );
+          }
+        },
+      );
+
+      console.log('ShippingStatus and OrderStatus Update successful');
     } catch (error) {
-      console.error('Error updating shipping status:', error);
+      console.error('Error updating statuses:', error);
     }
 
     //sent notifications

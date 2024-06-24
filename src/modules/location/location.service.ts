@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+// import { REQUEST } from '@nestjs/core';
 import { Model } from 'mongoose';
 import { Location } from './schemas/location.schema';
 import { SetCoordinatesAndSimulateDto } from './dtos/set-coordinates-and-simulate.dto';
-import { REQUEST } from '@nestjs/core';
 
 @Injectable()
 export class LocationService {
@@ -15,7 +15,7 @@ export class LocationService {
   private intervalRef: NodeJS.Timeout;
 
   constructor(
-    @Inject(REQUEST) private readonly request: Request,
+    // @Inject(REQUEST) private readonly request: Request,
     @InjectModel('Location') private locationModel: Model<Location>,
   ) {}
 
@@ -124,11 +124,12 @@ export class LocationService {
   }
 
   async updateRiderLocation(
+    req: any,
     latitude: number,
     longitude: number,
   ): Promise<Location> {
-    const riderId = this.request['user'].id;
-    console.log('riderId', riderId);
+    const riderId = req.user.id;
+    console.log('rider_Id', riderId);
     const updateData: any = {
       location: {
         type: 'Point',
@@ -147,11 +148,12 @@ export class LocationService {
   }
 
   async updateOnlineStatus(
+    req: any,
     isActive: boolean,
     latitude: number,
     longitude: number,
   ): Promise<Location> {
-    const riderId = this.request['user'].id;
+    const riderId = req.user.id;
     const updateData: any = {
       location: {
         type: 'Point',

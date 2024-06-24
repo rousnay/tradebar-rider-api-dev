@@ -4,6 +4,7 @@ import {
   Param,
   Put,
   Body,
+  Request,
   Query,
   Post,
   ParseIntPipe,
@@ -61,6 +62,7 @@ export class LocationController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access_token')
   async updateLocation(
+    @Request() req,
     @Body()
     updateLocationDto: {
       latitude: number;
@@ -68,15 +70,15 @@ export class LocationController {
     },
   ): Promise<{ status: string; message: string; data: Location }> {
     const { latitude, longitude } = updateLocationDto;
-    const result = await this.locationService.updateRiderLocation(
+    const location = await this.locationService.updateRiderLocation(
+      req,
       latitude,
       longitude,
     );
-
     return {
       status: 'success',
-      message: 'Rider approval status fetched successfully',
-      data: result,
+      message: 'Rider location updated successfully',
+      data: location,
     };
   }
 
@@ -85,18 +87,25 @@ export class LocationController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access_token')
   async updateOnlineStatus(
+    @Request() req,
     @Body()
     updateActiveStatusDto: {
       isActive: boolean;
       latitude: number;
       longitude: number;
     },
-  ): Promise<Location> {
+  ): Promise<{ status: string; message: string; data: Location }> {
     const { isActive, latitude, longitude } = updateActiveStatusDto;
-    return this.locationService.updateOnlineStatus(
+    const location = await this.locationService.updateOnlineStatus(
+      req,
       isActive,
       latitude,
       longitude,
     );
+    return {
+      status: 'success',
+      message: 'Rider online status updated successfully',
+      data: location,
+    };
   }
 }
