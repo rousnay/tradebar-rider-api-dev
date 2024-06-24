@@ -72,7 +72,7 @@ export class Riders extends BaseEntity {
   @Column({ default: false })
   is_driving_license_verified: boolean;
 
-  @Column({ default: false })
+  @Column({ default: true })
   is_active: boolean;
 
   @Column({ default: false })
