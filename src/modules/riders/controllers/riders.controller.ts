@@ -162,4 +162,30 @@ export class RiderController {
       ...result,
     };
   }
+
+  // Get account approval status of the logged in rider ++++++++++++++++++++++++++++++++++
+  @Get('/account-approval-status')
+  @ApiOperation({
+    summary: 'Get account approval status of the logged in rider',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
+  async getAccountApprovalStatus(): Promise<{
+    message: string;
+    status: string;
+    data: {
+      is_approved: boolean;
+    };
+  }> {
+    try {
+      const result = await this.ridersService.getAccountApprovalStatus();
+      return {
+        status: 'success',
+        message: 'Rider approval status fetched successfully',
+        ...result,
+      };
+    } catch (error) {
+      throw new Error(`Error fetching user: ${error.message}`);
+    }
+  }
 }
