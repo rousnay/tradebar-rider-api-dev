@@ -72,7 +72,7 @@ export class Riders extends BaseEntity {
   @Column({ default: false })
   is_driving_license_verified: boolean;
 
-  @Column({ default: true })
+  @Column({ default: false })
   is_active: boolean;
 
   @CreateDateColumn({ type: 'timestamp', nullable: true })
