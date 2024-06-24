@@ -17,15 +17,15 @@ export class LocationGateway {
   constructor(private readonly locationService: LocationService) {}
 
   afterInit(server: Server) {
-    this.logger.log('Init');
+    // this.logger.log('Init');
   }
 
   handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log(`Client connected: ${client.id}`);
+    // this.logger.log(`Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
+    // this.logger.log(`Client disconnected: ${client.id}`);
   }
 
   @SubscribeMessage('updateLocation')

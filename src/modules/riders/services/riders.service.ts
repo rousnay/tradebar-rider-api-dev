@@ -99,4 +99,20 @@ export class RidersService {
       data: rider,
     };
   }
+
+  async getAccountApprovalStatus(): Promise<{
+    data: {
+      is_approved: any;
+    };
+  }> {
+    const rider = await this.ridersRepository.findOne({
+      where: { id: this.request['user'].id },
+    });
+    console.log(rider);
+    return {
+      data: {
+        is_approved: rider.is_approved,
+      },
+    };
+  }
 }

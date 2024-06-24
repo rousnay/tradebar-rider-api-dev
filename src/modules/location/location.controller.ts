@@ -8,6 +8,7 @@ import {
   Post,
   ParseIntPipe,
   ParseFloatPipe,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,6 +17,7 @@ import {
   ApiParam,
   ApiQuery,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 
 import { Location } from './schemas/location.schema';
@@ -24,10 +26,11 @@ import {
   GetLocationOfRiderSwagger,
   GetNearbyRidersSwagger,
   SimulateLocationsSwagger,
-  UpdateActiveStatusSwagger,
   UpdateLocationOfRiderSwagger,
+  UpdateOnlineStatusSwagger,
 } from './decorators/swagger-decorators';
 import { LocationService } from './location.service';
+import { JwtAuthGuard } from '@core/guards/jwt-auth.guard';
 
 @ApiTags('Locations')
 @Controller('locations')
@@ -54,35 +57,46 @@ export class LocationController {
   }
 
   @UpdateLocationOfRiderSwagger()
-  @Put('rider/update/:riderId')
+  @Put('rider/update-location')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
   async updateLocation(
-    @Param('riderId') riderId: number,
     @Body()
     updateLocationDto: {
       latitude: number;
       longitude: number;
-      isActive?: boolean;
     },
-  ): Promise<Location> {
-    const { latitude, longitude, isActive } = updateLocationDto;
-    return this.locationService.updateLocation(
-      riderId,
+  ): Promise<{ status: string; message: string; data: Location }> {
+    const { latitude, longitude } = updateLocationDto;
+    const result = await this.locationService.updateRiderLocation(
       latitude,
       longitude,
-      isActive,
     );
+
+    return {
+      status: 'success',
+      message: 'Rider approval status fetched successfully',
+      data: result,
+    };
   }
 
-  @UpdateActiveStatusSwagger()
-  @Put('rider/status/:riderId')
-  async updateActiveStatus(
-    @Param('riderId') riderId: number,
+  @UpdateOnlineStatusSwagger()
+  @Put('rider/update-online-status')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
+  async updateOnlineStatus(
     @Body()
     updateActiveStatusDto: {
       isActive: boolean;
+      latitude: number;
+      longitude: number;
     },
   ): Promise<Location> {
-    const { isActive } = updateActiveStatusDto;
-    return this.locationService.updateActiveStatus(riderId, isActive);
+    const { isActive, latitude, longitude } = updateActiveStatusDto;
+    return this.locationService.updateOnlineStatus(
+      isActive,
+      latitude,
+      longitude,
+    );
   }
 }

@@ -79,6 +79,15 @@ export class DeliveryRequestService {
       WHERE id = ?
     `;
 
+
+
+    const updateOrderQuery = `
+      UPDATE orders
+      SET order_status = ?,
+      accepted_at = ?,
+      WHERE id = ?
+    `;
+
     try {
       await this.entityManager.query(updateShippingQuery, [
         ShippingStatus.ACCEPTED,
@@ -87,8 +96,15 @@ export class DeliveryRequestService {
         selectedVehicleId,
         deliveryRequest.deliveryId,
       ]);
-
       console.log('ShippingStatus Update successful');
+
+      await this.entityManager.query(updateOrderQuery, [
+        'accepted',
+        new Date(),
+        deliveryRequest.orderId,
+      ]);
+
+      console.log('OrderStatus Update successful');
     } catch (error) {
       console.error('Error updating shipping status:', error);
     }
