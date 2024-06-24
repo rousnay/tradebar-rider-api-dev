@@ -60,21 +60,21 @@ export class DeliveryRequestService {
       throw new NotFoundException('Delivery request not found');
     }
 
-    if (deliveryRequest.status === 'accepted') {
-      if (deliveryRequest?.assignedRider?.id === rider.id) {
-        throw new BadRequestException(
-          'You have already accepted this delivery request',
-        );
-      } else {
-        throw new BadRequestException(
-          'Delivery request has been accepted by another rider',
-        );
-      }
-    } else if (deliveryRequest.status !== 'searching') {
-      throw new BadRequestException(
-        'Delivery request is not in searching mode',
-      );
-    }
+    // if (deliveryRequest.status === 'accepted') {
+    //   if (deliveryRequest?.assignedRider?.id === rider.id) {
+    //     throw new BadRequestException(
+    //       'You have already accepted this delivery request',
+    //     );
+    //   } else {
+    //     throw new BadRequestException(
+    //       'Delivery request has been accepted by another rider',
+    //     );
+    //   }
+    // } else if (deliveryRequest.status !== 'searching') {
+    //   throw new BadRequestException(
+    //     'Delivery request is not in searching mode',
+    //   );
+    // }
 
     const updateFields = {
       status: ShippingStatus.ACCEPTED,
