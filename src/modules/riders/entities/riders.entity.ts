@@ -75,6 +75,9 @@ export class Riders extends BaseEntity {
   @Column({ default: false })
   is_active: boolean;
 
+  @Column({ default: false })
+  is_approved: boolean;
+
   @CreateDateColumn({ type: 'timestamp', nullable: true })
   registration_date: Date;
 
