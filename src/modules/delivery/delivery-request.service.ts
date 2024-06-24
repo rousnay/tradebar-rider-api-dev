@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -45,6 +50,9 @@ export class DeliveryRequestService {
     id: string,
     vehicleId: number,
   ): Promise<DeliveryRequest> {
+    const rider = req.user;
+    console.log('Rider #:', rider);
+
     const selectedVehicleId = Number(vehicleId || 0);
 
     const deliveryRequest = await this.deliveryRequestModel.findById(id).exec();
@@ -52,14 +60,21 @@ export class DeliveryRequestService {
       throw new NotFoundException('Delivery request not found');
     }
 
-    // if (deliveryRequest.status !== DeliveryStatus.SEARCHING) {
-    //   throw new BadRequestException(
-    //     'Delivery request is not in searching status',
-    //   );
-    // }
-
-    const rider = req.user;
-    console.log('Rider #:', rider);
+    if (deliveryRequest.status === 'accepted') {
+      if (deliveryRequest?.assignedRider?.id === rider.id) {
+        throw new BadRequestException(
+          'You have already accepted this delivery request',
+        );
+      } else {
+        throw new BadRequestException(
+          'Delivery request has been accepted by another rider',
+        );
+      }
+    } else if (deliveryRequest.status !== 'searching') {
+      throw new BadRequestException(
+        'Delivery request is not in searching mode',
+      );
+    }
 
     const updateFields = {
       status: ShippingStatus.ACCEPTED,
@@ -178,9 +193,9 @@ export class DeliveryRequestService {
     }
 
     let updateShippingQuery = `
-  UPDATE deliveries
-  SET shipping_status = ?
-`;
+    UPDATE deliveries
+      SET shipping_status = ?
+    `;
 
     const queryParams: (ShippingStatus | Date | number)[] = [status];
 
@@ -194,9 +209,9 @@ export class DeliveryRequestService {
 
     // Construct the updateOrderQuery based on the presence of accepted_at and cancelled_at
     let updateOrderQuery = `
-  UPDATE orders
-  SET order_status = ?
-`;
+      UPDATE orders
+      SET order_status = ?
+    `;
     const orderQueryParams: (string | Date | number)[] = [orderStatus];
 
     if (orderAcceptedDate) {
