@@ -105,10 +105,11 @@ export class RidersService {
       is_approved: any;
     };
   }> {
+    const riderId = this.request['user'].id;
+    console.log(riderId);
     const rider = await this.ridersRepository.findOne({
-      where: { id: this.request['user'].id },
+      where: { id: riderId },
     });
-    console.log(rider);
     return {
       data: {
         is_approved: rider.is_approved,

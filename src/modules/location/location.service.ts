@@ -4,6 +4,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Location } from './schemas/location.schema';
 import { SetCoordinatesAndSimulateDto } from './dtos/set-coordinates-and-simulate.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Riders } from '@modules/riders/entities/riders.entity';
+import { EntityManager, Repository } from 'typeorm';
 
 @Injectable()
 export class LocationService {
@@ -17,6 +20,7 @@ export class LocationService {
   constructor(
     // @Inject(REQUEST) private readonly request: Request,
     @InjectModel('Location') private locationModel: Model<Location>,
+    private readonly entityManager: EntityManager,
   ) {}
 
   private getRandomCoordinate(min: number, max: number): number {
@@ -162,6 +166,21 @@ export class LocationService {
       isActive,
       updatedAt: new Date(),
     };
+
+    const updateActiveStatusQuery = `UPDATE riders
+      SET is_active = ?
+      WHERE id = ?`;
+
+    await this.entityManager.query(updateActiveStatusQuery, [
+      isActive,
+      riderId,
+    ]);
+
+    // await this.ridersRepository.update(
+    //   { id: riderId },
+    //   { is_active: isActive },
+    // );
+
     return this.locationModel
       .findOneAndUpdate(
         { riderId },

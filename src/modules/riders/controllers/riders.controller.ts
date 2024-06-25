@@ -147,7 +147,7 @@ export class RiderController {
   }
 
   // Get a rider by ID ++++++++++++++++++++++++++++++++++
-  @Get('/:riderId')
+  @Get('by-id/:riderId')
   @ApiOperation({ summary: 'Get a rider by ID' })
   @ApiParam({ name: 'riderId', type: Number })
   @ApiResponse({ status: 200, type: Riders })
@@ -173,9 +173,7 @@ export class RiderController {
   async getAccountApprovalStatus(): Promise<{
     message: string;
     status: string;
-    data: {
-      is_approved: boolean;
-    };
+    data: any;
   }> {
     try {
       const result = await this.ridersService.getAccountApprovalStatus();
