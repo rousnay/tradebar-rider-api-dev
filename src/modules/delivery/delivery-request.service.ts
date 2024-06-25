@@ -55,8 +55,22 @@ export class DeliveryRequestService {
 
     const selectedVehicleId = Number(vehicleId || 0);
 
-    const deliveryRequest = await this.deliveryRequestModel.findById(id).exec();
-    if (!deliveryRequest) {
+    const updateFields = {
+      status: ShippingStatus.ACCEPTED,
+      assignedRider: {
+        id: rider.id,
+        name: `${rider.first_name} ${rider.last_name}`,
+        vehicleId: selectedVehicleId,
+      },
+    };
+
+    const updatedDeliveryRequest = await this.deliveryRequestModel
+      .findByIdAndUpdate(id, updateFields, { new: true })
+      .exec();
+
+    console.log('updatedDeliveryRequest:', updatedDeliveryRequest);
+
+    if (!updatedDeliveryRequest) {
       throw new NotFoundException('Delivery request not found');
     }
 
@@ -75,15 +89,6 @@ export class DeliveryRequestService {
     //     'Delivery request is not in searching mode',
     //   );
     // }
-
-    const updateFields = {
-      status: ShippingStatus.ACCEPTED,
-      assignedRider: {
-        id: rider.id,
-        name: `${rider.first_name} ${rider.last_name}`,
-        vehicleId: selectedVehicleId,
-      },
-    };
 
     const updateDeliveryQuery = `
       UPDATE deliveries
@@ -109,12 +114,12 @@ export class DeliveryRequestService {
             new Date(),
             rider.id,
             selectedVehicleId,
-            deliveryRequest.deliveryId,
+            updatedDeliveryRequest.deliveryId,
           ]);
 
           await transactionalEntityManager.query(updateOrderQuery, [
             new Date(),
-            deliveryRequest.deliveryId,
+            updatedDeliveryRequest.deliveryId,
           ]);
         },
       );
@@ -132,20 +137,24 @@ export class DeliveryRequestService {
       //   deliveryRequest.deliveryId,
       // ]);
 
-      console.log('ShippingStatus Update successful');
+      console.log('ShippingStatus: accepted Update successful');
     } catch (error) {
       console.error('Error updating shipping status:', error);
     }
 
     //sent notifications
+    const notificationSentToDeviceTokens =
     await this.deliveryNotificationService.sendDeliveryStatusNotification(
-      deliveryRequest,
+      updatedDeliveryRequest,
       ShippingStatus.ACCEPTED,
     );
 
-    return this.deliveryRequestModel
-      .findByIdAndUpdate(id, updateFields, { new: true })
-      .exec();
+    console.log(
+      'Delivery Status - ACCEPTED, notificationSentToDeviceTokens',
+      JSON.stringify(notificationSentToDeviceTokens, null, 2),
+    );
+
+    return updatedDeliveryRequest;
   }
 
   async updateDeliveryRequestStatus(
@@ -153,17 +162,22 @@ export class DeliveryRequestService {
     id: string,
     status: ShippingStatus,
   ): Promise<DeliveryRequest> {
-    const deliveryRequest = await this.deliveryRequestModel.findById(id).exec();
-    if (!deliveryRequest) {
+    // const deliveryRequest = await this.deliveryRequestModel.findById(id).exec();
+
+    const updateFields = {
+      status: status,
+    };
+
+    const updatedDeliveryRequest = await this.deliveryRequestModel
+      .findByIdAndUpdate(id, updateFields, { new: true })
+      .exec();
+
+    if (!updatedDeliveryRequest) {
       throw new NotFoundException('Delivery request not found');
     }
 
     const rider = req.user;
     // console.log('Rider #:', rider);
-
-    const updateFields = {
-      status: status,
-    };
 
     const theDate = new Date();
     let timestampField = '';
@@ -205,7 +219,7 @@ export class DeliveryRequestService {
     }
 
     updateShippingQuery += ' WHERE id = ? AND rider_id = ?';
-    queryParams.push(deliveryRequest.deliveryId, rider.id);
+    queryParams.push(updatedDeliveryRequest.deliveryId, rider.id);
 
     // Construct the updateOrderQuery based on the presence of accepted_at and cancelled_at
     let updateOrderQuery = `
@@ -225,7 +239,7 @@ export class DeliveryRequestService {
     }
 
     updateOrderQuery += ` WHERE id = (SELECT order_id FROM deliveries WHERE id = ?)`;
-    orderQueryParams.push(deliveryRequest.deliveryId);
+    orderQueryParams.push(updatedDeliveryRequest.deliveryId);
 
     // console.log('updateShippingQuery', updateShippingQuery);
     // console.log('queryParams', queryParams);
@@ -249,19 +263,24 @@ export class DeliveryRequestService {
         },
       );
 
-      console.log('ShippingStatus and OrderStatus Update successful');
+      console.log(
+        'ShippingStatus and OrderStatus: ' + status + ' Update successful',
+      );
+      //sent notifications
+      const notificationSentToDeviceTokens =
+      await this.deliveryNotificationService.sendDeliveryStatusNotification(
+        updatedDeliveryRequest,
+        status,
+      );
+
+      console.log(
+        'Delivery Status - ACCEPTED, notificationSentToDeviceTokens',
+        JSON.stringify(notificationSentToDeviceTokens, null, 2),
+      );
     } catch (error) {
       console.error('Error updating statuses:', error);
     }
 
-    //sent notifications
-    await this.deliveryNotificationService.sendDeliveryStatusNotification(
-      deliveryRequest,
-      status,
-    );
-
-    return this.deliveryRequestModel
-      .findByIdAndUpdate(id, updateFields, { new: true })
-      .exec();
+    return updatedDeliveryRequest;
   }
 }

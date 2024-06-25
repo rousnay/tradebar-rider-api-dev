@@ -82,7 +82,7 @@ export class DeliveryService {
         return {
           ...rest,
           requestFrom: {
-            id: warehouse_branch_id,
+            id: Number(warehouse_branch_id),
             name: warehouse_branch_name,
             url: null,
           },

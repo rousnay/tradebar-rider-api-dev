@@ -59,7 +59,10 @@ export class DeliveryNotificationService {
     }));
   }
 
-  async sendDeliveryStatusNotification(deliveryRequest: any, status: string) {
+  async sendDeliveryStatusNotification(
+    deliveryRequest: any,
+    status: string,
+  ): Promise<any> {
     const title = 'Delivery status update';
     const message = 'The rider has been ' + status + ' the order';
 
@@ -159,5 +162,10 @@ export class DeliveryNotificationService {
     console.log('customerId', customerId);
     console.log('warehouseId', warehouseId);
     console.log('userDeviceTokens', userDeviceTokens);
+    return {
+      customerId,
+      warehouseId,
+      userDeviceTokens,
+    };
   }
 }
