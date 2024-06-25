@@ -237,7 +237,7 @@ export class DeliveryService {
         pickupLocation: {
           id: pickup_id,
           name: pickup_first_name + ' ' + pickup_last_name,
-          phone_number_1: pickup_phone_number_1,
+          phone: pickup_phone_number_1,
           phone_number_2: pickup_phone_number_2,
           address: pickup_address,
           city: pickup_city,
@@ -251,7 +251,7 @@ export class DeliveryService {
         dropOffLocation: {
           id: shipping_id,
           name: shipping_first_name + ' ' + shipping_last_name,
-          phone_number_1: shipping_phone_number_1,
+          phone: shipping_phone_number_1,
           phone_number_2: shipping_phone_number_2,
           address: shipping_address,
           city: shipping_city,
@@ -307,13 +307,13 @@ export class DeliveryService {
       modifiedResult = {
         ...rest,
         requestFrom: {
-          id: warehouse_branch_id,
+          id: Number(warehouse_branch_id),
           name: warehouse_branch_name,
           url: null,
         },
         pickupLocation: {
-          warehouse_branch_id: warehouse_branch_id,
-          warehouse_branch_name: warehouse_branch_name,
+          id: Number(warehouse_branch_id),
+          name: warehouse_branch_name,
           phone: warehouse_branch_phone,
           address: warehouse_branch_address,
           postal_code: warehouse_branch_postal_code,
@@ -325,7 +325,7 @@ export class DeliveryService {
         dropOffLocation: {
           id: shipping_id,
           name: shipping_first_name + ' ' + shipping_last_name,
-          phone_number_1: shipping_phone_number_1,
+          phone: shipping_phone_number_1,
           phone_number_2: shipping_phone_number_2,
           address: shipping_address,
           city: shipping_city,
