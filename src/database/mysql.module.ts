@@ -26,7 +26,19 @@ import { ConfigService } from '@config/config.service';
         // ssl: {
         //   rejectUnauthorized: true,
         // },
-        // logging: ['query', 'error', 'schema', 'warn', 'info', 'log', 'migration'],
+        extra: {
+          connectionLimit: 10, // Use connection pooling
+          keepAliveInitialDelay: 10000, // Adjust the initial delay
+        },
+        logging: [
+          // 'query',
+          'error',
+          // 'schema',
+          'warn',
+          // 'info',
+          'log',
+          // 'migration',
+        ],
       }),
     }),
   ],
