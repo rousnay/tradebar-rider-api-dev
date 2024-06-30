@@ -37,6 +37,14 @@ export class UpdateRiderDto extends PartialType(CreateRiderDto) {
   gender?: Gender | null;
 
   @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'Driving license number',
+    required: false,
+  })
+  driving_license_number?: string;
+
+  @IsOptional()
   @ApiProperty({
     type: 'string',
     format: 'binary',

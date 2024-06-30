@@ -58,6 +58,7 @@
     "mysql2": "^3.6.5",
     "nest-winston": "^1.9.6",
     "nestjs-form-data": "^1.9.7",
+    "nodemailer": "^6.9.14",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",

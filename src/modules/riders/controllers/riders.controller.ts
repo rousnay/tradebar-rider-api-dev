@@ -133,6 +133,7 @@ export class RiderController {
     updateRiderDto.email = formData.email;
     updateRiderDto.date_of_birth = formData.date_of_birth;
     updateRiderDto.gender = formData.gender;
+    updateRiderDto.driving_license_number = formData.driving_license_number;
     updateRiderDto.profile_image_cf_media_id = cf_media_id;
 
     const result = await this.ridersService.editRiderProfile(updateRiderDto);

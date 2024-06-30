@@ -24,6 +24,9 @@ export class Vehicles {
   model: string;
 
   @Column({ nullable: true })
+  year: number;
+
+  @Column({ nullable: true })
   color: string;
 
   @Column({ nullable: true })

@@ -16,6 +16,7 @@ import { RiderDrivingService } from './services/rider-driving.service';
 import { Vehicles } from './entities/vehicles.entity';
 import { VehiclesService } from './services/vehicles.service';
 import { VehiclesController } from './controllers/vehicles.controller';
+import { MailService } from '@services/mail.service';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { VehiclesController } from './controllers/vehicles.controller';
     RiderDrivingService,
     VehicleTypeService,
     CloudflareMediaService,
+    MailService,
   ],
   controllers: [
     RiderController,

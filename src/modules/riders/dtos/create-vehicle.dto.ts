@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNumber, IsString, IsOptional, } from 'class-validator';
+import { IsNumber, IsString, IsOptional } from 'class-validator';
 
 export class CreateVehicleDto {
   @IsNumber()
@@ -24,6 +24,11 @@ export class CreateVehicleDto {
   @IsOptional()
   @ApiProperty({ required: false })
   model?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty({ required: false })
+  year?: number;
 
   @IsString()
   @IsOptional()

@@ -16,4 +16,7 @@ export const AppConstants = {
     success_url: 'https://raw-bertie-wittyplex.koyeb.app/' as const,
     cancel_url: 'https://raw-bertie-wittyplex.koyeb.app/' as const,
   },
+  mail: {
+    recipient: 'mr.rousnay@gmail.com' as const,
+  },
 };

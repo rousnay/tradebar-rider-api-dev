@@ -111,6 +111,7 @@ export class VehiclesController {
     createVehicleDto.type_id = formData.type_id || null;
     createVehicleDto.brand = formData.brand;
     createVehicleDto.model = formData.model;
+    createVehicleDto.year = formData.year;
     createVehicleDto.color = formData.color;
     createVehicleDto.vehicle_image_cf_media_id = cf_media_id;
     createVehicleDto.license_plate = formData.license_plate;

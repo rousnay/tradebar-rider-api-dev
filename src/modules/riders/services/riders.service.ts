@@ -5,9 +5,11 @@ import { REQUEST } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import * as Sentry from '@sentry/node';
 
+import { AppConstants } from '@common/constants/constants';
 import { UpdateRiderDto } from '../dtos/update-riders.dto';
 import { ApiResponseDto } from '../dtos/api-response.dto';
 import { Riders } from '../entities/riders.entity';
+import { MailService } from '@services/mail.service';
 
 @Injectable()
 export class RidersService {
@@ -19,6 +21,7 @@ export class RidersService {
     private readonly entityManager: EntityManager,
     @InjectRepository(Riders)
     private ridersRepository: Repository<Riders>,
+    private readonly mailService: MailService,
   ) {}
 
   public async getRiders({
@@ -71,16 +74,40 @@ export class RidersService {
       throw new NotFoundException('Rider not found');
     }
 
+    const { driving_license_number, ...modifiedUpdatedRiderDto } =
+      updateRiderDto;
+
     // Update the rider's profile directly in the database
-    await this.ridersRepository.update({ id: riderId }, updateRiderDto);
+    await this.ridersRepository.update(
+      { id: riderId },
+      modifiedUpdatedRiderDto,
+    );
 
     // Fetch the updated rider profile
     const updatedRider = await this.ridersRepository.findOne({
       where: { id: riderId },
     });
 
+    if (driving_license_number) {
+      console.log('driving_license_number:', driving_license_number);
+
+      await this.mailService.sendMail(
+        AppConstants.mail.recipient, // Replace with your recipient email address
+        'Driving License Number of Rider: ' + updatedRider.id,
+        'Driving License Number: ' + driving_license_number,
+        `
+      <h3>Profile Information</h3>
+      <p><strong> Rider Name: </strong> ${
+        updatedRider.first_name + ' ' + updatedRider.last_name
+      }</p>
+      <p><strong> Rider Id: </strong> ${updatedRider.id}</p>
+      <p><strong> Driving License Number: </strong> ${driving_license_number}</p>
+      `,
+      );
+    }
+
     return {
-      data: updatedRider,
+      data: { ...updatedRider, driving_license_number },
     };
   }
 
