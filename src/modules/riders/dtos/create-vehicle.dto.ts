@@ -3,16 +3,16 @@ import { Type } from 'class-transformer';
 import { IsNumber, IsString, IsOptional } from 'class-validator';
 
 export class CreateVehicleDto {
-  @IsNumber()
+  // @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, type: Number })
   owner_id?: number;
 
-  @IsNumber()
+  // @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, type: Number })
   type_id?: number;
 
   @IsString()
@@ -25,9 +25,9 @@ export class CreateVehicleDto {
   @ApiProperty({ required: false })
   model?: string;
 
-  @IsNumber()
+  // @IsNumber()
   @IsOptional()
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, type: Number })
   year?: number;
 
   @IsString()

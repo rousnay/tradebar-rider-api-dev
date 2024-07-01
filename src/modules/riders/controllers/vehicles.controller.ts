@@ -89,6 +89,7 @@ export class VehiclesController {
     @UploadedFile() vehicle_image: Express.Multer.File,
     @Body() formData: CreateVehicleDto,
   ): Promise<{ message: string; status: string; data: Vehicles }> {
+    console.log('addVehicle: formData', formData);
     let cf_media_id = null;
     let vehicle_image_url = null;
 
@@ -107,11 +108,15 @@ export class VehiclesController {
     }
 
     const createVehicleDto = new CreateVehicleDto();
-    createVehicleDto.owner_id = formData.owner_id || null;
-    createVehicleDto.type_id = formData.type_id || null;
+    createVehicleDto.owner_id = formData.owner_id
+      ? Number(formData.owner_id)
+      : null;
+    createVehicleDto.type_id = formData.type_id
+      ? Number(formData.type_id)
+      : null;
     createVehicleDto.brand = formData.brand;
     createVehicleDto.model = formData.model;
-    createVehicleDto.year = formData.year;
+    createVehicleDto.year = formData.year ? Number(formData.year) : null;
     createVehicleDto.color = formData.color;
     createVehicleDto.vehicle_image_cf_media_id = cf_media_id;
     createVehicleDto.license_plate = formData.license_plate;
@@ -158,10 +163,15 @@ export class VehiclesController {
     }
 
     const updateVehicleDto = new UpdateVehicleDto();
-    updateVehicleDto.owner_id = formData.owner_id || null;
-    updateVehicleDto.type_id = formData.type_id || null;
+    updateVehicleDto.owner_id = formData.owner_id
+      ? Number(formData.owner_id)
+      : null;
+    updateVehicleDto.type_id = formData.type_id
+      ? Number(formData.type_id)
+      : null;
     updateVehicleDto.brand = formData.brand;
     updateVehicleDto.model = formData.model;
+    updateVehicleDto.year = formData.year ? Number(formData.year) : null;
     updateVehicleDto.color = formData.color;
     updateVehicleDto.vehicle_image_cf_media_id = cf_media_id;
     updateVehicleDto.license_plate = formData.license_plate;
