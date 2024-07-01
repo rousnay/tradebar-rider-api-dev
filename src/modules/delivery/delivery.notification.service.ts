@@ -72,13 +72,15 @@ export class DeliveryNotificationService {
         deliveryRequest?.assignedRider?.name +
         '.',
       [ShippingStatus.REACHED_AT_PICKUP_POINT]:
-        'The rider has arrived the pickup point.',
+        'The rider ' +
+        deliveryRequest?.assignedRider?.name +
+        'has arrived at the pickup point.',
       [ShippingStatus.PICKED_UP]:
         'The order has been picked up by ' +
         deliveryRequest?.assignedRider?.name +
         '.',
       [ShippingStatus.REACHED_AT_DELIVERY_POINT]:
-        'Your rider ' +
+        'The rider ' +
         deliveryRequest?.assignedRider?.name +
         ' has reached the delivery point.',
       [ShippingStatus.DELIVERED]: 'The order has been delivered.',
@@ -89,7 +91,6 @@ export class DeliveryNotificationService {
     const title = 'Delivery status update';
     const message =
       statusMessages[status] || 'The delivery status has changed.';
-    // const message = 'The rider has been ' + status + ' the order';
 
     const data = {
       type: 'delivery',
