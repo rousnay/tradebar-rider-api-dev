@@ -3,6 +3,7 @@ import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { NotificationService } from '@modules/notification/notification.service';
 import { REQUEST } from '@nestjs/core';
+import { ShippingStatus } from '@common/enums/delivery.enum';
 
 @Injectable()
 export class DeliveryNotificationService {
@@ -63,8 +64,32 @@ export class DeliveryNotificationService {
     deliveryRequest: any,
     status: string,
   ): Promise<any> {
+    const statusMessages: { [key in ShippingStatus]: string } = {
+      [ShippingStatus.WAITING]: 'The order is waiting for a rider.',
+      [ShippingStatus.SEARCHING]: 'A rider is being searched for the order.',
+      [ShippingStatus.ACCEPTED]:
+        'Your delivery request has been accepted by ' +
+        deliveryRequest?.assignedRider?.name +
+        '.',
+      [ShippingStatus.REACHED_AT_PICKUP_POINT]:
+        'The rider has arrived the pickup point.',
+      [ShippingStatus.PICKED_UP]:
+        'The order has been picked up by ' +
+        deliveryRequest?.assignedRider?.name +
+        '.',
+      [ShippingStatus.REACHED_AT_DELIVERY_POINT]:
+        'Your rider ' +
+        deliveryRequest?.assignedRider?.name +
+        ' has reached the delivery point.',
+      [ShippingStatus.DELIVERED]: 'The order has been delivered.',
+      [ShippingStatus.EXPIRED]: 'Your delivery request has been expired.',
+      [ShippingStatus.CANCELLED]: 'Your delivery request has been cancelled.',
+    };
+
     const title = 'Delivery status update';
-    const message = 'The rider has been ' + status + ' the order';
+    const message =
+      statusMessages[status] || 'The delivery status has changed.';
+    // const message = 'The rider has been ' + status + ' the order';
 
     const data = {
       type: 'delivery',

@@ -27,6 +27,7 @@ export class CreateVehicleDto {
 
   // @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   @ApiProperty({ required: false, type: Number })
   year?: number;
 
