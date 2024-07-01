@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { AuthModule } from '@modules/auth/auth.module';
 import { RidersModule } from '@modules/riders/riders.module';
+import { UserBankInfoModule } from '@modules/user-bank-info/user-bank-info.module';
 import { DeliveryModule } from '@modules/delivery/delivery.module';
 import { LocationModule } from '@modules/location/location.module';
 import { ChatModule } from '@modules/chat/chat.module';
@@ -20,6 +21,7 @@ import { NotificationsModule } from '@modules/notification/notification.module';
     MongoModule,
     AuthModule,
     RidersModule,
+    UserBankInfoModule,
     DeliveryModule,
     LocationModule,
     ChatModule,
