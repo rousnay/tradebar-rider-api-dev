@@ -70,7 +70,7 @@ export class DeliveryNotificationService {
       [ShippingStatus.SEARCHING]:
         'A rider is being searched to accept the delivery request.',
       [ShippingStatus.ACCEPTED]:
-        'Your delivery request has been accepted by rider' +
+        'Your delivery request has been accepted by ' +
         deliveryRequest?.assignedRider?.name +
         '.',
       [ShippingStatus.REACHED_AT_PICKUP_POINT]:
@@ -118,14 +118,16 @@ export class DeliveryNotificationService {
 
       console.log('userDeviceTokens for notification:', userDeviceTokens);
 
-      for (const customer of userDeviceTokens) {
-        await this.notificationService.sendAndStoreNotification(
-          customer.userId,
-          customer.tokens,
-          title,
-          message,
-          { ...data },
-        );
+      if (userDeviceTokens !== null) {
+        for (const customer of userDeviceTokens) {
+          await this.notificationService.sendAndStoreNotification(
+            customer.userId,
+            customer.tokens,
+            title,
+            message,
+            { ...data },
+          );
+        }
       }
     } else if (deliveryRequest?.orderType === 'warehouse_transportation') {
       warehouseId = deliveryRequest?.pickupLocation?.warehouse_id;
@@ -139,15 +141,16 @@ export class DeliveryNotificationService {
       userDeviceTokens = await this.getUserDeviceTokensByWarehouseId(
         warehouseId,
       );
-
-      for (const warehouse of userDeviceTokens) {
-        await this.notificationService.sendAndStoreNotification(
-          warehouse.userId,
-          warehouse.tokens,
-          title,
-          message,
-          { ...data },
-        );
+      if (userDeviceTokens !== null) {
+        for (const warehouse of userDeviceTokens) {
+          await this.notificationService.sendAndStoreNotification(
+            warehouse.userId,
+            warehouse.tokens,
+            title,
+            message,
+            { ...data },
+          );
+        }
       }
     } else {
       customerId = deliveryRequest?.dropOffLocation?.customer_id;
@@ -158,14 +161,16 @@ export class DeliveryNotificationService {
         customerId,
       );
 
-      for (const customer of customerDeviceTokens) {
-        await this.notificationService.sendAndStoreNotification(
-          customer.userId,
-          customer.tokens,
-          title,
-          message,
-          { ...data },
-        );
+      if (customerDeviceTokens !== null) {
+        for (const customer of customerDeviceTokens) {
+          await this.notificationService.sendAndStoreNotification(
+            customer.userId,
+            customer.tokens,
+            title,
+            message,
+            { ...data },
+          );
+        }
       }
 
       warehouseId = deliveryRequest?.pickupLocation?.warehouse_id;
@@ -180,15 +185,17 @@ export class DeliveryNotificationService {
         warehouseId,
       );
 
-      for (const warehouse of warehouseDeviceTokens) {
-        console.log('warehouse', warehouse);
-        await this.notificationService.sendAndStoreNotification(
-          warehouse.userId,
-          warehouse.tokens,
-          title,
-          message,
-          { ...data },
-        );
+      if (warehouseDeviceTokens !== null) {
+        for (const warehouse of warehouseDeviceTokens) {
+          console.log('warehouse', warehouse);
+          await this.notificationService.sendAndStoreNotification(
+            warehouse.userId,
+            warehouse.tokens,
+            title,
+            message,
+            { ...data },
+          );
+        }
       }
 
       userDeviceTokens = customerDeviceTokens.concat(warehouseDeviceTokens);
