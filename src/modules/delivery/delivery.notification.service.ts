@@ -4,6 +4,7 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { NotificationService } from '@modules/notification/notification.service';
 import { REQUEST } from '@nestjs/core';
 import { ShippingStatus } from '@common/enums/delivery.enum';
+import { AppConstants } from '@common/constants/constants';
 
 @Injectable()
 export class DeliveryNotificationService {
@@ -66,13 +67,14 @@ export class DeliveryNotificationService {
   ): Promise<any> {
     const statusMessages: { [key in ShippingStatus]: string } = {
       [ShippingStatus.WAITING]: 'The order is waiting for a rider.',
-      [ShippingStatus.SEARCHING]: 'A rider is being searched for the order.',
+      [ShippingStatus.SEARCHING]:
+        'A rider is being searched to accept the delivery request.',
       [ShippingStatus.ACCEPTED]:
-        'Your delivery request has been accepted by ' +
+        'Your delivery request has been accepted by rider' +
         deliveryRequest?.assignedRider?.name +
         '.',
       [ShippingStatus.REACHED_AT_PICKUP_POINT]:
-        'The rider ' +
+        'Rider ' +
         deliveryRequest?.assignedRider?.name +
         'has arrived at the pickup point.',
       [ShippingStatus.PICKED_UP]:
@@ -80,10 +82,13 @@ export class DeliveryNotificationService {
         deliveryRequest?.assignedRider?.name +
         '.',
       [ShippingStatus.REACHED_AT_DELIVERY_POINT]:
-        'The rider ' +
+        'Rider ' +
         deliveryRequest?.assignedRider?.name +
         ' has reached the delivery point.',
-      [ShippingStatus.DELIVERED]: 'The order has been delivered.',
+      [ShippingStatus.DELIVERED]:
+        'The order has been delivered by ' +
+        deliveryRequest?.assignedRider?.name +
+        '.',
       [ShippingStatus.EXPIRED]: 'Your delivery request has been expired.',
       [ShippingStatus.CANCELLED]: 'Your delivery request has been cancelled.',
     };
@@ -125,7 +130,8 @@ export class DeliveryNotificationService {
       data['target'] = 'warehouse';
       data['warehouseId'] = warehouseId.toString();
       data['url'] =
-        'https://cgp-warehouse.vercel.app/deliveries/' +
+        AppConstants.appServices.warehouseBaseUrl +
+        '/deliveries/' +
         deliveryRequest?.deliveryId;
 
       userDeviceTokens = await this.getUserDeviceTokensByWarehouseId(
@@ -164,7 +170,8 @@ export class DeliveryNotificationService {
       data['target'] = 'warehouse';
       data['warehouseId'] = warehouseId.toString();
       data['url'] =
-        'https://cgp-warehouse.vercel.app/deliveries/' +
+        AppConstants.appServices.warehouseBaseUrl +
+        '/deliveries/' +
         deliveryRequest?.deliveryId;
 
       const warehouseDeviceTokens = await this.getUserDeviceTokensByWarehouseId(
