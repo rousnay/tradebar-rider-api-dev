@@ -116,6 +116,8 @@ export class DeliveryNotificationService {
 
       userDeviceTokens = await this.getUserDeviceTokensByCustomerId(customerId);
 
+      console.log('userDeviceTokens for notification:', userDeviceTokens);
+
       for (const customer of userDeviceTokens) {
         await this.notificationService.sendAndStoreNotification(
           customer.userId,
