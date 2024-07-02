@@ -119,6 +119,7 @@ export class DeliveryNotificationService {
       console.log('userDeviceTokens for notification:', userDeviceTokens);
 
       if (userDeviceTokens !== null) {
+        console.log('userDeviceTokens NULL check pass!');
         for (const customer of userDeviceTokens) {
           await this.notificationService.sendAndStoreNotification(
             customer.userId,
