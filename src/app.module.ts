@@ -13,6 +13,7 @@ import { DeliveryModule } from '@modules/delivery/delivery.module';
 import { LocationModule } from '@modules/location/location.module';
 import { ChatModule } from '@modules/chat/chat.module';
 import { NotificationsModule } from '@modules/notification/notification.module';
+import { ReviewModule } from '@modules/review/review.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NotificationsModule } from '@modules/notification/notification.module';
     LocationModule,
     ChatModule,
     NotificationsModule,
+    ReviewModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
