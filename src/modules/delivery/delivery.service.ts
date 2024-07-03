@@ -32,7 +32,20 @@ export class DeliveryService {
       d.delivery_charge,
       d.shipping_status,
       d.accepted_at,
-      d.delivered_at
+      d.delivered_at,
+
+        ors.id AS order_review_id,
+        ors.model_id AS order_review_model_id,
+        ors.given_by_id AS order_review_given_by_id,
+        ors.given_by_type_id AS order_review_given_by_type_id,
+        ors.given_to_id AS order_review_given_to_id,
+        ors.given_to_type_id AS order_review_given_to_type_id,
+        ors.rating AS order_review_rating,
+        ors.review AS order_review_review,
+        ors.reply AS order_review_reply,
+        ors.created_at AS order_review_created_at,
+        ors.updated_at AS order_review_updated_at
+
     FROM
       deliveries d
     INNER JOIN
@@ -43,15 +56,17 @@ export class DeliveryService {
       warehouses w ON w.id = o.warehouse_id
     LEFT JOIN
       warehouse_branches wb ON wb.warehouse_id = w.id
+    LEFT JOIN
+        overall_reviews ors ON o.id = ors.model_id AND ors.model = 'App\\\\Models\\\\Order'
     WHERE
       d.rider_id = ?
     ORDER BY
       d.delivered_at
     `;
 
-    const results = await this.entityManager.query(query, [id]);
+    const deliveries = await this.entityManager.query(query, [id]);
 
-    const modifiedResults = results.map((result) => {
+    const modifiedResults = deliveries.map((result) => {
       if (result.order_type === OrderType.TRANSPORTATION_ONLY) {
         const {
           customer_id,
@@ -90,7 +105,78 @@ export class DeliveryService {
       }
     });
 
-    return modifiedResults;
+    const modifiedResult = modifiedResults.reduce((acc, row) => {
+      let order = acc.find((o) => o.id === row.id);
+      if (!order) {
+        order = {
+          id: row.id,
+          order_type: row.order_type,
+          order_status: row.order_status,
+          customer_id: row.customer_id,
+          warehouse_id: row.warehouse_id,
+          billing_address_id: row.billing_address_id,
+          pickup_address_id: row.pickup_address_id,
+          shipping_address_id: row.shipping_address_id,
+          vehicle_type_id: row.vehicle_type_id,
+          payment_id: row.payment_id,
+          distance_in_km: row.distance_in_km,
+          duration_in_min: row.duration_in_min,
+          total_cost: row.total_cost,
+          discount: row.discount,
+          gst: row.gst,
+          delivery_charge: row.delivery_charge,
+          payable_amount: row.payable_amount,
+          cancel_reason_id: row.cancel_reason_id,
+          created_at: row.created_at,
+          accepted_at: row.accepted_at,
+          cancelled_at: row.cancelled_at,
+          updated_at: row.updated_at,
+          reviews: {
+            given: null,
+            received: null,
+          },
+        };
+        acc.push(order);
+      }
+
+      if (row.order_review_id) {
+        const review = {
+          id: row.order_review_id,
+          model_id: row.order_review_model_id,
+          given_by_id: row.order_review_given_by_id,
+          given_by_type_id: row.order_review_given_by_type_id,
+          given_to_id: row.order_review_given_to_id,
+          given_to_type_id: row.order_review_given_to_type_id,
+          rating: row.order_review_rating,
+          review: row.order_review_review,
+          reply: row.order_review_reply,
+          created_at: row.order_review_created_at,
+          updated_at: row.order_review_updated_at,
+        };
+
+        if (Number(row.order_review_given_by_id) === id) {
+          order.reviews.given = {
+            id: Number(review.id),
+            rating: review.rating,
+            review: review.review,
+            created_at: review.created_at,
+            updated_at: review.updated_at,
+          };
+        } else if (Number(row.order_review_given_to_id) === id) {
+          order.reviews.received = {
+            id: Number(review.id),
+            rating: review.rating,
+            review: review.review,
+            created_at: review.created_at,
+            updated_at: review.updated_at,
+          };
+        }
+      }
+
+      return acc;
+    }, []);
+
+    return modifiedResult;
   }
 
   async findOne(req: any, deliveryId: number): Promise<any> {
@@ -143,15 +229,28 @@ export class DeliveryService {
         shipping_cb.notes AS shipping_notes,
 
 
-      c.id as customer_id,
-      c.first_name as customer_first_name,
-      c.last_name as customer_last_name,
-      d.delivery_charge,
-      d.shipping_status,
-      d.init_distance as distance,
-      d.init_duration as duration,
-      d.accepted_at,
-      d.delivered_at
+        c.id as customer_id,
+        c.first_name as customer_first_name,
+        c.last_name as customer_last_name,
+        d.delivery_charge,
+        d.shipping_status,
+        d.init_distance as distance,
+        d.init_duration as duration,
+        d.accepted_at,
+        d.delivered_at,
+
+        ors.id AS order_review_id,
+        ors.model_id AS order_review_model_id,
+        ors.given_by_id AS order_review_given_by_id,
+        ors.given_by_type_id AS order_review_given_by_type_id,
+        ors.given_to_id AS order_review_given_to_id,
+        ors.given_to_type_id AS order_review_given_to_type_id,
+        ors.rating AS order_review_rating,
+        ors.review AS order_review_review,
+        ors.reply AS order_review_reply,
+        ors.created_at AS order_review_created_at,
+        ors.updated_at AS order_review_updated_at
+
     FROM
       deliveries d
     INNER JOIN
@@ -166,15 +265,65 @@ export class DeliveryService {
       warehouses w ON w.id = o.warehouse_id
     LEFT JOIN
       warehouse_branches wb ON wb.warehouse_id = w.id
+    LEFT JOIN
+        overall_reviews ors ON o.id = ors.model_id AND ors.model = 'App\\\\Models\\\\Order'
     WHERE
       d.rider_id = ? AND d.id = ?
     `;
 
     const results = await this.entityManager.query(query, [id, deliveryId]);
 
+    // if (results.length === 0) {
+    //   throw new Error('Delivery not found');
+    // }
+
     if (results.length === 0) {
-      throw new Error('Delivery not found');
+      throw new NotFoundException('Delivery not found');
     }
+
+    let givenReview = null;
+    let receivedReview = null;
+
+    results.map((row) => {
+      const review = {
+        id: row.order_review_id,
+        model_id: row.order_review_model_id,
+        given_by_id: row.order_review_given_by_id,
+        given_by_type_id: row.order_review_given_by_type_id,
+        given_to_id: row.order_review_given_to_id,
+        given_to_type_id: row.order_review_given_to_type_id,
+        rating: row.order_review_rating,
+        review: row.order_review_review,
+        reply: row.order_review_reply,
+        created_at: row.order_review_created_at,
+        updated_at: row.order_review_updated_at,
+      };
+
+      if (Number(row.order_review_given_by_id) === id) {
+        givenReview = {
+          id: Number(review.id),
+          rating: review.rating,
+          review: review.review,
+          created_at: review.created_at,
+          updated_at: review.updated_at,
+        };
+      } else if (Number(row.order_review_given_to_id) === id) {
+        receivedReview = {
+          id: Number(review.id),
+          rating: review.rating,
+          review: review.review,
+          created_at: review.created_at,
+          updated_at: review.updated_at,
+        };
+      }
+
+      return review;
+    });
+
+    const reviews = {
+      given: givenReview,
+      received: receivedReview,
+    };
 
     const result = results[0];
     let modifiedResult;
@@ -339,6 +488,6 @@ export class DeliveryService {
       };
     }
 
-    return modifiedResult;
+    return { ...modifiedResult, reviews };
   }
 }
