@@ -21,6 +21,7 @@ export class DeliveryService {
     const query = `
     SELECT
       d.id,
+      d.order_id,
       o.order_type as order_type,
       w.id as warehouse_id,
       w.name as warehouse_name,
@@ -32,6 +33,8 @@ export class DeliveryService {
       d.delivery_charge,
       d.shipping_status,
       d.accepted_at,
+      d.picked_up_at,
+      d.cancelled_at,
       d.delivered_at,
 
         ors.id AS order_review_id,
@@ -66,7 +69,7 @@ export class DeliveryService {
 
     const deliveries = await this.entityManager.query(query, [id]);
 
-    const modifiedResults = deliveries.map((result) => {
+    const modifiedDeliveries = deliveries.map((result) => {
       if (result.order_type === OrderType.TRANSPORTATION_ONLY) {
         const {
           customer_id,
@@ -105,30 +108,19 @@ export class DeliveryService {
       }
     });
 
-    const modifiedResult = modifiedResults.reduce((acc, row) => {
+    const allDeliveries = modifiedDeliveries.reduce((acc, row) => {
       let order = acc.find((o) => o.id === row.id);
       if (!order) {
         order = {
           id: row.id,
+          order_id: row.order_id,
           order_type: row.order_type,
-          order_status: row.order_status,
-          customer_id: row.customer_id,
-          warehouse_id: row.warehouse_id,
-          billing_address_id: row.billing_address_id,
-          pickup_address_id: row.pickup_address_id,
-          shipping_address_id: row.shipping_address_id,
-          vehicle_type_id: row.vehicle_type_id,
-          payment_id: row.payment_id,
-          distance_in_km: row.distance_in_km,
-          duration_in_min: row.duration_in_min,
-          total_cost: row.total_cost,
-          discount: row.discount,
-          gst: row.gst,
+          shipping_status: row.shipping_status,
           delivery_charge: row.delivery_charge,
-          payable_amount: row.payable_amount,
-          cancel_reason_id: row.cancel_reason_id,
           created_at: row.created_at,
           accepted_at: row.accepted_at,
+          picked_up_at: row.picked_up_at,
+          delivered_at: row.delivered_at,
           cancelled_at: row.cancelled_at,
           updated_at: row.updated_at,
           reviews: {
@@ -176,7 +168,8 @@ export class DeliveryService {
       return acc;
     }, []);
 
-    return modifiedResult;
+    // return modifiedDeliveries;
+    return allDeliveries;
   }
 
   async findOne(req: any, deliveryId: number): Promise<any> {
@@ -184,6 +177,7 @@ export class DeliveryService {
     const query = `
     SELECT
       d.id,
+      d.order_id,
       o.order_type as order_type,
 
       w.id as warehouse_id,
@@ -325,9 +319,23 @@ export class DeliveryService {
       received: receivedReview,
     };
 
-    const result = results[0];
-    let modifiedResult;
-    if (result.order_type === OrderType.TRANSPORTATION_ONLY) {
+    const {
+      order_review_id,
+      order_review_model_id,
+      order_review_given_by_id,
+      order_review_given_by_type_id,
+      order_review_given_to_id,
+      order_review_given_to_type_id,
+      order_review_rating,
+      order_review_review,
+      order_review_reply,
+      order_review_created_at,
+      order_review_updated_at,
+      ...modifiedResult
+    } = results[0];
+
+    let deliveryData;
+    if (modifiedResult.order_type === OrderType.TRANSPORTATION_ONLY) {
       const {
         customer_id,
         customer_first_name,
@@ -375,8 +383,8 @@ export class DeliveryService {
         warehouse_branch_contact_person_email,
 
         ...rest
-      } = result;
-      modifiedResult = {
+      } = modifiedResult;
+      deliveryData = {
         ...rest,
         requestFrom: {
           id: customer_id,
@@ -452,8 +460,8 @@ export class DeliveryService {
         pickup_longitude,
         pickup_notes,
         ...rest
-      } = result;
-      modifiedResult = {
+      } = modifiedResult;
+      deliveryData = {
         ...rest,
         requestFrom: {
           id: Number(warehouse_branch_id),
@@ -488,6 +496,6 @@ export class DeliveryService {
       };
     }
 
-    return { ...modifiedResult, reviews };
+    return { ...deliveryData, reviews };
   }
 }
