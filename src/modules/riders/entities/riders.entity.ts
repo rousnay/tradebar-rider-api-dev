@@ -69,6 +69,9 @@ export class Riders extends BaseEntity {
   @Column({ nullable: true })
   driving_schedule_id: number;
 
+  @Column({ nullable: true })
+  active_vehicle_id: number;
+
   @Column({ default: false })
   is_driving_license_verified: boolean;
 

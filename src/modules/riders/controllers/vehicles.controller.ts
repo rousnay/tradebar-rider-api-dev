@@ -48,12 +48,18 @@ export class VehiclesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access_token')
   @ApiOperation({ summary: 'Get all vehicles of rider' })
-  async getAllVehiclesOfRider(): Promise<{
+  @ApiQuery({
+    name: 'type_id',
+    type: Number,
+    required: false,
+    description: 'Vehicle type id (optional)',
+  })
+  async getAllVehiclesOfRider(@Query('type_id') type_id?: number): Promise<{
     status: string;
     message: string;
     data: Vehicles[];
   }> {
-    const results = await this.vehiclesService.getAllVehiclesOfRider();
+    const results = await this.vehiclesService.getAllVehiclesOfRider(type_id);
 
     return {
       status: 'success',

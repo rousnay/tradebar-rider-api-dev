@@ -29,14 +29,14 @@ export class VehiclesService {
     this.cfAccountHash = configService.cloudflareAccountHash;
   }
 
-  async getAllVehiclesOfRider(): Promise<any[]> {
+  async getAllVehiclesOfRider(type_id: number): Promise<any[]> {
     const rider_id = this.request['user'].id;
     const riderVehicles = await this.riderVehiclesRepository.find({
       where: { rider_id },
     });
     const vehicleIds = riderVehicles.map((rv) => rv.vehicle_id);
     const allVehicles = await this.vehiclesRepository.find({
-      where: { id: In(vehicleIds) },
+      where: { id: In(vehicleIds), type_id },
     });
 
     // Use Promise.all to fetch vehicle types concurrently and transform the vehicles

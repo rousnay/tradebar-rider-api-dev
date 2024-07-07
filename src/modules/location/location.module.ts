@@ -4,10 +4,13 @@ import { LocationService } from './location.service';
 import { LocationController } from './location.controller';
 import { LocationGateway } from './location.gateway';
 import { LocationSchema } from './schemas/location.schema';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Vehicles } from '@modules/riders/entities/vehicles.entity';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Location', schema: LocationSchema }]),
+    TypeOrmModule.forFeature([Vehicles]),
   ],
   providers: [LocationService, LocationGateway],
   exports: [LocationService],

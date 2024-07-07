@@ -7,6 +7,7 @@ import { SetCoordinatesAndSimulateDto } from './dtos/set-coordinates-and-simulat
 import { InjectRepository } from '@nestjs/typeorm';
 import { Riders } from '@modules/riders/entities/riders.entity';
 import { EntityManager, Repository } from 'typeorm';
+import { Vehicles } from '@modules/riders/entities/vehicles.entity';
 
 @Injectable()
 export class LocationService {
@@ -21,6 +22,8 @@ export class LocationService {
     // @Inject(REQUEST) private readonly request: Request,
     @InjectModel('Location') private locationModel: Model<Location>,
     private readonly entityManager: EntityManager,
+    @InjectRepository(Vehicles)
+    private vehiclesRepository: Repository<Vehicles>,
   ) {}
 
   private getRandomCoordinate(min: number, max: number): number {
@@ -154,6 +157,7 @@ export class LocationService {
   async updateOnlineStatus(
     req: any,
     isActive: boolean,
+    vehicleId: number,
     latitude: number,
     longitude: number,
   ): Promise<Location> {
@@ -167,19 +171,32 @@ export class LocationService {
       updatedAt: new Date(),
     };
 
-    const updateActiveStatusQuery = `UPDATE riders
-      SET is_active = ?
-      WHERE id = ?`;
+    let updateActiveStatusQuery = `
+    UPDATE riders
+      SET is_active = ?,
+          updated_at = NOW()`;
 
-    await this.entityManager.query(updateActiveStatusQuery, [
-      isActive,
-      riderId,
-    ]);
+    const queryParams: (boolean | number)[] = [isActive];
 
-    // await this.ridersRepository.update(
-    //   { id: riderId },
-    //   { is_active: isActive },
-    // );
+    // Check if vehicleId exists
+    if (vehicleId) {
+      // Append the active_vehicle_id update part to the query
+      updateActiveStatusQuery += `, active_vehicle_id = ?`;
+      queryParams.push(vehicleId);
+
+      // Find the vehicle and update the activeVehicleTypeId
+      const vehicle = await this.vehiclesRepository.findOne({
+        where: { id: vehicleId },
+      });
+
+      updateData.activeVehicleId = vehicleId;
+      updateData.activeVehicleTypeId = vehicle?.type_id;
+    }
+
+    updateActiveStatusQuery += ` WHERE id = ?`;
+    queryParams.push(riderId);
+
+    await this.entityManager.query(updateActiveStatusQuery, queryParams);
 
     return this.locationModel
       .findOneAndUpdate(
