@@ -53,11 +53,26 @@ export class CreateVehicleDto {
     description: 'Vehicle image',
     required: false,
   })
-  vehicle_image?: Express.Multer.File;
+  vehicle_fron_imaget?: Express.Multer.File;
 
   @IsOptional()
-  vehicle_image_url?: string;
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'Vehicle image',
+    required: false,
+  })
+  vehicle_back_image?: Express.Multer.File;
 
   @IsOptional()
-  vehicle_image_cf_media_id?: number;
+  vehicle_front_image_url?: string;
+
+  @IsOptional()
+  vehicle_back_image_url?: string;
+
+  @IsOptional()
+  vehicle_image_front_cf_media_id?: number;
+
+  @IsOptional()
+  vehicle_image_back_cf_media_id?: number;
 }

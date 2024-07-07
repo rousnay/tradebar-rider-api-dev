@@ -33,6 +33,12 @@ export class Vehicles {
   vehicle_image_cf_media_id: number;
 
   @Column({ nullable: true })
+  vehicle_image_front_cf_media_id: number;
+
+  @Column({ nullable: true })
+  vehicle_image_back_cf_media_id: number;
+
+  @Column({ nullable: true })
   license_plate: string;
 
   @Column({ length: 60, nullable: true })

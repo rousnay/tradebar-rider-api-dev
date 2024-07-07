@@ -84,19 +84,23 @@ export class VehiclesController {
   @ApiOperation({ summary: 'Add new vehicle' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateVehicleDto })
-  @UseInterceptors(FileInterceptor('vehicle_image'))
+  @UseInterceptors(FileInterceptor('vehicle_front_image'))
+  @UseInterceptors(FileInterceptor('vehicle_back_image'))
   async addVehicle(
-    @UploadedFile() vehicle_image: Express.Multer.File,
+    @UploadedFile() vehicle_front_image: Express.Multer.File,
+    @UploadedFile() vehicle_back_image: Express.Multer.File,
     @Body() formData: CreateVehicleDto,
   ): Promise<{ message: string; status: string; data: Vehicles }> {
     console.log('addVehicle: formData', formData);
     let cf_media_id = null;
-    let vehicle_image_url = null;
+    let cf_media_back_id = null;
+    let vehicle_front_image_url = null;
+    let vehicle_back_image_url = null;
 
-    if (vehicle_image) {
-      console.log('vehicle_image exist');
+    if (vehicle_front_image) {
+      // console.log('vehicle_image exist');
       const result = await this.cloudflareMediaService.uploadMedia(
-        vehicle_image,
+        vehicle_front_image,
         {
           model: 'Rider-vehicleImage',
           model_id: 100,
@@ -104,7 +108,21 @@ export class VehiclesController {
         },
       );
       cf_media_id = result?.data?.id;
-      vehicle_image_url = result?.data?.media_url;
+      vehicle_front_image_url = result?.data?.media_url;
+    }
+
+    if (vehicle_back_image) {
+      // console.log('vehicle_image exist');
+      const result = await this.cloudflareMediaService.uploadMedia(
+        vehicle_back_image,
+        {
+          model: 'Rider-vehicleImage',
+          model_id: 100,
+          image_type: 'thumbnail',
+        },
+      );
+      cf_media_back_id = result?.data?.id;
+      vehicle_back_image_url = result?.data?.media_url;
     }
 
     const createVehicleDto = new CreateVehicleDto();
@@ -118,13 +136,15 @@ export class VehiclesController {
     createVehicleDto.model = formData.model;
     createVehicleDto.year = formData.year ? Number(formData.year) : null;
     createVehicleDto.color = formData.color;
-    createVehicleDto.vehicle_image_cf_media_id = cf_media_id;
+    createVehicleDto.vehicle_image_front_cf_media_id = cf_media_id;
+    createVehicleDto.vehicle_image_back_cf_media_id = cf_media_back_id;
     createVehicleDto.license_plate = formData.license_plate;
     createVehicleDto.registration_number = formData.registration_number;
 
     const result = await this.vehiclesService.addVehicle(createVehicleDto);
 
-    result.data.vehicle_image_url = vehicle_image_url;
+    result.data.vehicle_front_image_url = vehicle_front_image_url;
+    result.data.vehicle_back_image_url = vehicle_back_image_url;
 
     return {
       status: 'success',
