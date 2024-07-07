@@ -30,7 +30,12 @@ export function UpdateOnlineStatusSwagger() {
     ApiBody({
       description: 'Set status',
       schema: {
-        example: { isActive: true, latitude: 23.722, longitude: 90.4515 },
+        example: {
+          isActive: true,
+          vehicleId: 5,
+          latitude: 23.722,
+          longitude: 90.4515,
+        },
       },
     }),
     ApiResponse({

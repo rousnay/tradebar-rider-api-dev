@@ -62,6 +62,8 @@ export class DeliveryRequestService {
         name: `${rider.first_name} ${rider.last_name}`,
         vehicleId: selectedVehicleId,
       },
+      acceptedAt: new Date(),
+      updatedAt: new Date(),
     };
 
     const updatedDeliveryRequest = await this.deliveryRequestModel
@@ -144,10 +146,10 @@ export class DeliveryRequestService {
 
     //sent notifications
     const notificationSentToDeviceTokens =
-    await this.deliveryNotificationService.sendDeliveryStatusNotification(
-      updatedDeliveryRequest,
-      ShippingStatus.ACCEPTED,
-    );
+      await this.deliveryNotificationService.sendDeliveryStatusNotification(
+        updatedDeliveryRequest,
+        ShippingStatus.ACCEPTED,
+      );
 
     console.log(
       'Delivery Status - ACCEPTED, notificationSentToDeviceTokens',
@@ -166,7 +168,12 @@ export class DeliveryRequestService {
 
     const updateFields = {
       status: status,
+      updatedAt: new Date(),
     };
+
+    if (status === ShippingStatus.CANCELLED) {
+      updateFields['cancelledAt'] = new Date();
+    }
 
     const updatedDeliveryRequest = await this.deliveryRequestModel
       .findByIdAndUpdate(id, updateFields, { new: true })
@@ -268,10 +275,10 @@ export class DeliveryRequestService {
       );
       //sent notifications
       const notificationSentToDeviceTokens =
-      await this.deliveryNotificationService.sendDeliveryStatusNotification(
-        updatedDeliveryRequest,
-        status,
-      );
+        await this.deliveryNotificationService.sendDeliveryStatusNotification(
+          updatedDeliveryRequest,
+          status,
+        );
 
       console.log(
         'Delivery Status - ACCEPTED, notificationSentToDeviceTokens',

@@ -36,8 +36,14 @@ export class UserBankInfo {
   @Column({ default: false })
   is_default: boolean;
 
+  @Column({ default: false })
+  is_verified: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  verified_at: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updated_at: Date;

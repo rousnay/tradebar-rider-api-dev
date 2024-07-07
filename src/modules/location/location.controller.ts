@@ -91,14 +91,16 @@ export class LocationController {
     @Body()
     updateActiveStatusDto: {
       isActive: boolean;
+      vehicleId?: number;
       latitude: number;
       longitude: number;
     },
   ): Promise<{ status: string; message: string; data: Location }> {
-    const { isActive, latitude, longitude } = updateActiveStatusDto;
+    const { isActive, vehicleId, latitude, longitude } = updateActiveStatusDto;
     const location = await this.locationService.updateOnlineStatus(
       req,
       isActive,
+      vehicleId,
       latitude,
       longitude,
     );
