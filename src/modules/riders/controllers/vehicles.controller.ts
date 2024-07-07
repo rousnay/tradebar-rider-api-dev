@@ -176,6 +176,7 @@ export class VehiclesController {
     updateVehicleDto.vehicle_image_cf_media_id = cf_media_id;
     updateVehicleDto.license_plate = formData.license_plate;
     updateVehicleDto.registration_number = formData.registration_number;
+    updateVehicleDto.year = formData.year;
 
     const result = await this.vehiclesService.updateVehicle(
       vehicle_id,
@@ -186,7 +187,7 @@ export class VehiclesController {
 
     return {
       status: 'success',
-      message: 'Vehicle has been added successfully',
+      message: 'Vehicle has been updated successfully',
       ...result,
     };
   }

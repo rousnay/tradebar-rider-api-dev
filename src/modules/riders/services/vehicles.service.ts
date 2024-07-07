@@ -158,6 +158,7 @@ export class VehiclesService {
     const riderVehicle = await this.riderVehiclesRepository.findOne({
       where: { rider_id, vehicle_id },
     });
+    
     if (!riderVehicle) {
       throw new NotFoundException(`Vehicle with ID ${vehicle_id} not found`);
     }
