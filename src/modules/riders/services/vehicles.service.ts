@@ -45,17 +45,56 @@ export class VehiclesService {
         const vehicleTypeObj = await this.vehicleTypeService.findOne(
           vehicle.type_id,
         );
-        let vehicle_image_url = null;
+        // let vehicle_image_url = null;
 
-        if (vehicle.vehicle_image_cf_media_id != null) {
+        // if (vehicle.vehicle_image_cf_media_id != null) {
+        //   const cloudflare_id = await this.entityManager
+        //     .createQueryBuilder()
+        //     .select(['cf.cloudflare_id'])
+        //     .from('cf_media', 'cf')
+        //     .where('cf.id = :id', { id: vehicle.vehicle_image_cf_media_id })
+        //     .getRawOne();
+
+        //   vehicle_image_url =
+        //     this.cfMediaBaseUrl +
+        //     '/' +
+        //     this.cfAccountHash +
+        //     '/' +
+        //     cloudflare_id.cloudflare_id +
+        //     '/' +
+        //     this.cfMediaVariant;
+        // }
+
+        let vehicle_front_image_url = null;
+        let vehicle_back_image_url = null;
+
+        if (vehicle.vehicle_image_front_cf_media_id != null) {
           const cloudflare_id = await this.entityManager
             .createQueryBuilder()
             .select(['cf.cloudflare_id'])
             .from('cf_media', 'cf')
-            .where('cf.id = :id', { id: vehicle.vehicle_image_cf_media_id })
+            .where('cf.id = :id', { id: vehicle.vehicle_image_front_cf_media_id })
             .getRawOne();
 
-          vehicle_image_url =
+          vehicle_front_image_url =
+            this.cfMediaBaseUrl +
+            '/' +
+            this.cfAccountHash +
+            '/' +
+            cloudflare_id.cloudflare_id +
+            '/' +
+            this.cfMediaVariant;
+        }
+
+        if (vehicle.vehicle_image_back_cf_media_id != null) {
+          const cloudflare_id = await this.entityManager
+            .createQueryBuilder()
+            .select(['cf.cloudflare_id'])
+            .from('cf_media', 'cf')
+            .where('cf.id = :id', { id: vehicle.vehicle_image_back_cf_media_id })
+            .getRawOne();
+
+          vehicle_back_image_url =
             this.cfMediaBaseUrl +
             '/' +
             this.cfAccountHash +
@@ -72,7 +111,8 @@ export class VehiclesService {
         return {
           ...vehicleWithoutTypeId,
           type: vehicleTypeObj,
-          vehicle_image_url: vehicle_image_url,
+          vehicle_front_image_url: vehicle_front_image_url,
+          vehicle_back_image_url: vehicle_back_image_url
         };
       }),
     );
@@ -96,17 +136,36 @@ export class VehiclesService {
       vehicle.type_id,
     );
 
-    let vehicle_image_url = null;
+    let vehicle_front_image_url = null;
+    let vehicle_back_image_url = null;
 
-    if (vehicle.vehicle_image_cf_media_id != null) {
+    if (vehicle.vehicle_image_front_cf_media_id != null) {
       const cloudflare_id = await this.entityManager
         .createQueryBuilder()
         .select(['cf.cloudflare_id'])
         .from('cf_media', 'cf')
-        .where('cf.id = :id', { id: vehicle.vehicle_image_cf_media_id })
+        .where('cf.id = :id', { id: vehicle.vehicle_image_front_cf_media_id })
         .getRawOne();
 
-      vehicle_image_url =
+      vehicle_front_image_url =
+        this.cfMediaBaseUrl +
+        '/' +
+        this.cfAccountHash +
+        '/' +
+        cloudflare_id.cloudflare_id +
+        '/' +
+        this.cfMediaVariant;
+    }
+
+    if (vehicle.vehicle_image_back_cf_media_id != null) {
+      const cloudflare_id = await this.entityManager
+        .createQueryBuilder()
+        .select(['cf.cloudflare_id'])
+        .from('cf_media', 'cf')
+        .where('cf.id = :id', { id: vehicle.vehicle_image_back_cf_media_id })
+        .getRawOne();
+
+      vehicle_back_image_url =
         this.cfMediaBaseUrl +
         '/' +
         this.cfAccountHash +
@@ -123,7 +182,8 @@ export class VehiclesService {
       data: {
         ...vehicleWithoutTypeId,
         type: vehicleTypeObj,
-        vehicle_image_url,
+        vehicle_front_image_url,
+        vehicle_back_image_url
       },
     };
   }
@@ -173,17 +233,36 @@ export class VehiclesService {
       vehicle.type_id,
     );
 
-    let vehicle_image_url = null;
+    let vehicle_front_image_url = null;
+    let vehicle_back_image_url = null;
 
-    if (vehicle.vehicle_image_cf_media_id != null) {
+    if (vehicle.vehicle_image_front_cf_media_id != null) {
       const cloudflare_id = await this.entityManager
         .createQueryBuilder()
         .select(['cf.cloudflare_id'])
         .from('cf_media', 'cf')
-        .where('cf.id = :id', { id: vehicle.vehicle_image_cf_media_id })
+        .where('cf.id = :id', { id: vehicle.vehicle_image_front_cf_media_id })
         .getRawOne();
 
-      vehicle_image_url =
+      vehicle_front_image_url =
+        this.cfMediaBaseUrl +
+        '/' +
+        this.cfAccountHash +
+        '/' +
+        cloudflare_id.cloudflare_id +
+        '/' +
+        this.cfMediaVariant;
+    }
+
+    if (vehicle.vehicle_image_back_cf_media_id != null) {
+      const cloudflare_id = await this.entityManager
+        .createQueryBuilder()
+        .select(['cf.cloudflare_id'])
+        .from('cf_media', 'cf')
+        .where('cf.id = :id', { id: vehicle.vehicle_image_back_cf_media_id })
+        .getRawOne();
+
+      vehicle_back_image_url =
         this.cfMediaBaseUrl +
         '/' +
         this.cfAccountHash +
@@ -200,7 +279,8 @@ export class VehiclesService {
       data: {
         ...vehicleWithoutTypeId,
         type: vehicleTypeObj,
-        vehicle_image_url,
+        vehicle_front_image_url,
+        vehicle_back_image_url
       },
     };
   }
