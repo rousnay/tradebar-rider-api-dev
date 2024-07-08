@@ -60,18 +60,23 @@ export class RidersService {
     try {
       const rider = this.request['user'];
       let ongoing_trip = null;
-      // find deliver id and order id
+      // find deliver id and order id for find ongoing trip
       const deliveriesData = await this.entityManager.query(
         'SELECT id,order_id,shipping_status FROM deliveries WHERE rider_id = ? AND shipping_status IN ("accepted","reached_at_pickup_point","picked_up","reached_at_delivery_point")',
         [rider.id],
       );
-      console.log(deliveriesData);
+
       if (deliveriesData.length > 0) {
         // find deliver request id
-        const deliverRequestData = await this.deliveryRequestModel.find({
-          orderId: deliveriesData[0].order_id,
-          deliveryId: deliveriesData[0].id,
-        });
+        const deliverRequestData = await this.deliveryRequestModel.find(
+          {
+            orderId: deliveriesData[0].order_id,
+            deliveryId: deliveriesData[0].id,
+          },
+          {
+            select: ['_id'],
+          },
+        );
         ongoing_trip = {
           order_id: deliveriesData[0].order_id || null,
           delivery_id: deliveriesData[0].id || null,
