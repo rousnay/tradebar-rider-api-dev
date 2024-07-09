@@ -76,7 +76,10 @@ export class UserPaymentHistory {
   tradebar_fee: number;
 
   @Column({ nullable: true })
-  total_amount: number;
+  net_balance: number;
+
+  @Column({ nullable: true })
+  payable_amount: number;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
