@@ -17,6 +17,11 @@ import { Vehicles } from './entities/vehicles.entity';
 import { VehiclesService } from './services/vehicles.service';
 import { VehiclesController } from './controllers/vehicles.controller';
 import { MailService } from '@services/mail.service';
+import {
+  DeliveryRequest,
+  DeliveryRequestSchema,
+} from '@modules/delivery/schemas/delivery-request.schema';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -26,7 +31,15 @@ import { MailService } from '@services/mail.service';
       timeout: 5000,
       maxRedirects: 5,
     }),
-    TypeOrmModule.forFeature([Riders, Vehicles, RiderVehicles]),
+    TypeOrmModule.forFeature([
+      Riders,
+      Vehicles,
+      RiderVehicles,
+      DeliveryRequest,
+    ]),
+    MongooseModule.forFeature([
+      { name: DeliveryRequest.name, schema: DeliveryRequestSchema },
+    ]),
   ],
   exports: [RidersService],
   providers: [

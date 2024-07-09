@@ -13,6 +13,11 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 
 import { Riders } from '@modules/riders/entities/riders.entity';
 import { ReviewService } from '@modules/review/review.service';
+import { RidersService } from '../riders/services/riders.service';
+import { MailService } from '@services/mail.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { DeliveryRequest } from '@modules/delivery/schemas/delivery-request.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +29,10 @@ export class AuthService {
     @InjectRepository(Riders)
     private riderRepository: Repository<Riders>,
     private reviewService: ReviewService,
+    private ridersService: RidersService,
+    private readonly mailService: MailService,
+    @InjectModel(DeliveryRequest.name)
+    private deliveryRequestModel: Model<DeliveryRequest>,
   ) {}
 
   async registration(
@@ -209,13 +218,15 @@ export class AuthService {
           const avg_rating = await this.reviewService.getAverageRating(
             rider?.id,
           );
-
+          const ongoing_trip = await this.ridersService.getRiderOnGoingTrip(
+            rider?.id,
+          );
           return {
             status: 'success',
             message: response?.data?.msg,
             data: {
               // user: user,
-              rider: { ...rider, avg_rating },
+              rider: { ...rider, avg_rating, ongoing_trip },
               access_token: access_token,
               // auth_token: response?.data?.data?.auth_token,
             },
@@ -353,14 +364,16 @@ export class AuthService {
           const avg_rating = await this.reviewService.getAverageRating(
             rider?.id,
           );
-
+          const ongoing_trip = await this.ridersService.getRiderOnGoingTrip(
+            rider?.id,
+          );
           return {
             status: 'success',
             message: response?.data?.msg,
             data: {
               // user: user,
               // rider: rider,
-              rider: { ...rider, avg_rating },
+              rider: { ...rider, avg_rating, ongoing_trip },
               access_token: access_token,
               // auth_token: response?.data?.data?.auth_token,
             },
@@ -485,13 +498,18 @@ export class AuthService {
         const rider = await this.riderRepository.findOne({
           where: { user_id: user?.id },
         });
-
+        const ongoing_trip = await this.ridersService.getRiderOnGoingTrip(
+          rider?.id,
+        );
         return {
           status: 'success',
           message: response?.data?.msg,
           data: {
             // user: user,
-            rider: rider,
+            rider: {
+              ...rider,
+              ongoing_trip,
+            },
           },
         };
       } else {
