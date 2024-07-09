@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Location</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCUqRnsyjWiluojL3z2-9VRoZ7ABubgbpE"></script>
+  <style>
+    #map {
+      height: 500px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Share Rider Location</h1>
+  <div>
+    <label for="riderIdInput">Rider ID:</label>
+    <input id="riderIdInput" type="text" readonly>
+  </div>
+  <div>
+    <label for="latitudeInput">Latitude:</label>
+    <input id="latitudeInput" type="text" placeholder="Enter latitude" readonly>
+  </div>
+  <div>
+    <label for="longitudeInput">Longitude:</label>
+    <input id="longitudeInput" type="text" placeholder="Enter longitude" readonly>
+  </div>
+
+  <div id="map"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let currentLatitude, currentLongitude;
+    let socket;
+    let map;
+    let marker;
+
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    function initMap() {
+      const initialPosition = { lat: 0, lng: 0 };
+      map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: initialPosition
+      });
+      marker = new google.maps.Marker({
+        position: initialPosition,
+        map: map
+      });
+    }
+
+    function updateMapPosition(latitude, longitude) {
+      const newPosition = { lat: latitude, lng: longitude };
+      marker.setPosition(newPosition);
+      map.setCenter(newPosition);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const riderIdInput = document.getElementById('riderIdInput');
+      const latitudeInput = document.getElementById('latitudeInput');
+      const longitudeInput = document.getElementById('longitudeInput');
+
+      const riderId = getQueryParam('riderid');
+      console.log(`Query parameter riderid: ${riderId}`); // Debug information
+
+      if (!riderId) {
+        alert('Rider ID not provided in query parameters.');
+        return;
+      }
+      riderIdInput.value = riderId;
+
+      // socket = io('https://cgp-rider-api.onrender.com');
+      const socket = io('http://localhost:8000');
+
+      socket.on('connect', () => {
+        console.log('Connected to WebSocket server');
+      });
+
+      socket.on('locationUpdated', (location) => {
+
+        console.log('Location received:', location);
+        updateMapPosition(location.location.coordinates[1], location.location.coordinates[0]);
+      });
+
+      function updateLocationInputs(latitude, longitude) {
+        latitudeInput.value = latitude;
+        longitudeInput.value = longitude;
+      }
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.watchPosition(
+          position => {
+            currentLatitude = position.coords.latitude;
+            currentLongitude = position.coords.longitude;
+            updateLocationInputs(currentLatitude, currentLongitude);
+            sendLocation();
+            updateMapPosition(currentLatitude, currentLongitude);
+          },
+          error => {
+            console.error(`Error getting location: ${error.message}`);
+          }
+        );
+      } else {
+        console.error('Geolocation is not supported by this browser.');
+      }
+
+      function sendLocation() {
+        if (riderId && currentLatitude !== undefined && currentLongitude !== undefined) {
+          socket.emit('updateLocation', { riderId, latitude: currentLatitude, longitude: currentLongitude });
+          console.log(`Location sent: ${currentLatitude}, ${currentLongitude}`);
+        } else {
+          console.error('Location data or Rider ID is missing.');
+        }
+      }
+
+      initMap();
+    });
+  </script>
+</body>
+</html>

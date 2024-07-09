@@ -96,13 +96,10 @@ export class DeliveryRequestController {
   async acceptDeliveryRequest(
     @Request() req,
     @Param('id') id: string,
-    @Param('vehicleId') vehicleId: number,
   ): Promise<{ status: string; message: string; data: DeliveryRequest }> {
-    console.log('vehicleId', vehicleId);
     const updatedData = await this.deliveryRequestService.acceptDeliveryRequest(
       req,
       id,
-      vehicleId,
     );
     return {
       status: 'success',

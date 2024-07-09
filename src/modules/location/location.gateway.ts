@@ -35,15 +35,25 @@ export class LocationGateway {
       riderId: number;
       latitude: number;
       longitude: number;
-      isActive?: boolean;
+      // isActive?: boolean;
     },
   ) {
     const location = await this.locationService.updateLocation(
       payload.riderId,
       payload.latitude,
       payload.longitude,
-      payload.isActive,
+      // payload.isActive,
     );
+
+    //Use this.server.emit instead of client.emit to broadcast the update to all connected clients.
     this.server.emit('locationUpdated', location);
+  }
+
+  @SubscribeMessage('getRiderLocation')
+  async handleGetRiderLocation(client: Socket, payload: { riderId: number }) {
+    const location = await this.locationService.getLocationByRiderId(
+      payload.riderId,
+    );
+    client.emit('riderLocation', location);
   }
 }

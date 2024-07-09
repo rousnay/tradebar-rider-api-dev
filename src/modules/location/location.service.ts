@@ -107,7 +107,7 @@ export class LocationService {
     riderId: number,
     latitude: number,
     longitude: number,
-    isActive?: boolean,
+    // isActive?: boolean,
   ): Promise<Location> {
     const updateData: any = {
       location: {
@@ -117,9 +117,9 @@ export class LocationService {
       updatedAt: new Date(),
     };
 
-    if (isActive !== undefined) {
-      updateData.isActive = isActive;
-    }
+    // if (isActive !== undefined) {
+    //   updateData.isActive = isActive;
+    // }
 
     return this.locationModel
       .findOneAndUpdate(
@@ -204,6 +204,13 @@ export class LocationService {
         { $set: updateData },
         { new: true, upsert: true },
       )
+      .exec();
+  }
+
+  async getLocationByRiderId(riderId: number): Promise<Location> {
+    return this.locationModel
+      .findOne({ riderId })
+      .sort({ updatedAt: -1 })
       .exec();
   }
 }

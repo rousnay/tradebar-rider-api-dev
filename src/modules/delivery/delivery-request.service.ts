@@ -45,15 +45,11 @@ export class DeliveryRequestService {
     return this.deliveryRequestModel.findById(id).exec();
   }
 
-  async acceptDeliveryRequest(
-    req: any,
-    id: string,
-    vehicleId: number,
-  ): Promise<DeliveryRequest> {
+  async acceptDeliveryRequest(req: any, id: string): Promise<DeliveryRequest> {
     const rider = req.user;
     console.log('Rider #:', rider);
 
-    const selectedVehicleId = Number(vehicleId || 0);
+    const selectedVehicleId = req.user?.active_vehicle_id;
 
     const updateFields = {
       status: ShippingStatus.ACCEPTED,
