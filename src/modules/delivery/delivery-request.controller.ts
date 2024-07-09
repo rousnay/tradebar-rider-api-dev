@@ -78,7 +78,7 @@ export class DeliveryRequestController {
     };
   }
 
-  @Patch('accept/:id/:vehicleId')
+  @Patch('accept/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access_token')
   @ApiOperation({ summary: 'Update a delivery request' })
