@@ -10,6 +10,9 @@ import { UpdateRiderDto } from '../dtos/update-riders.dto';
 import { ApiResponseDto } from '../dtos/api-response.dto';
 import { Riders } from '../entities/riders.entity';
 import { MailService } from '@services/mail.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { DeliveryRequest } from '@modules/delivery/schemas/delivery-request.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class RidersService {
@@ -22,6 +25,8 @@ export class RidersService {
     @InjectRepository(Riders)
     private ridersRepository: Repository<Riders>,
     private readonly mailService: MailService,
+    @InjectModel(DeliveryRequest.name)
+    private deliveryRequestModel: Model<DeliveryRequest>,
   ) {}
 
   public async getRiders({
@@ -54,14 +59,51 @@ export class RidersService {
   public async getLoggedInRiderProfile(): Promise<{ data: Riders }> {
     try {
       const rider = this.request['user'];
+      const ongoing_trip = await this.getRiderOnGoingTrip(rider.id);
+
+      // Update the rider's profile directly in the database
       return {
-        data: rider,
+        data: {
+          ...rider,
+          ongoing_trip,
+        },
       };
     } catch (error) {
       throw new Error(`Error fetching riders: ${error.message}`);
     }
   }
 
+  public async getRiderOnGoingTrip(riderId: any): Promise<{ data: any }> {
+    let ongoing_trip = null;
+    // find deliver id and order id for find ongoing trip
+    const deliveriesData = await this.entityManager.query(
+      'SELECT id,order_id,shipping_status FROM deliveries WHERE rider_id = ? AND shipping_status IN ("accepted","reached_at_pickup_point","picked_up","reached_at_delivery_point")',
+      [riderId],
+    );
+
+    if (deliveriesData.length > 0) {
+      // find deliver request id
+      const deliverRequestData = await this.deliveryRequestModel.find(
+        {
+          orderId: deliveriesData[0].order_id,
+          deliveryId: deliveriesData[0].id,
+        },
+        {
+          select: ['_id'],
+        },
+      );
+      ongoing_trip = {
+        order_id: deliveriesData[0].order_id || null,
+        delivery_id: deliveriesData[0].id || null,
+        shipping_status: deliveriesData[0].shipping_status || null,
+        delivery_request_id:
+          deliverRequestData.length > 0 ? deliverRequestData[0]._id : null,
+      };
+      return ongoing_trip;
+    } else {
+      return null;
+    }
+  }
   public async editRiderProfile(
     updateRiderDto: UpdateRiderDto,
   ): Promise<{ data: any }> {

@@ -11,8 +11,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('user_bank_info')
-export class UserBankInfo {
+@Entity('user_payment_history')
+export class UserPaymentHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
