@@ -9,6 +9,7 @@ import { AppController } from './app.controller';
 import { AuthModule } from '@modules/auth/auth.module';
 import { RidersModule } from '@modules/riders/riders.module';
 import { UserBankInfoModule } from '@modules/user-bank-info/user-bank-info.module';
+import { UserPaymentHistoryModule } from '@modules/user-payment-history/user-payment-history.module';
 import { DeliveryModule } from '@modules/delivery/delivery.module';
 import { LocationModule } from '@modules/location/location.module';
 import { ChatModule } from '@modules/chat/chat.module';
@@ -23,6 +24,7 @@ import { ReviewModule } from '@modules/review/review.module';
     AuthModule,
     RidersModule,
     UserBankInfoModule,
+    UserPaymentHistoryModule,
     DeliveryModule,
     LocationModule,
     ChatModule,
