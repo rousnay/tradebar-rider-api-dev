@@ -6,9 +6,13 @@ import { DeliveryRequest } from './schemas/delivery-request.schema';
 import { Model } from 'mongoose';
 import { ShippingStatus } from '@common/enums/delivery.enum';
 import { OrderType } from '@common/enums/order.enum';
+import { AppConstants } from '@common/constants/constants';
 
 @Injectable()
 export class DeliveryService {
+    private readonly cfAccountHash: string;
+    private readonly cfMediaVariant = AppConstants.cloudflare.mediaVariant;
+    private readonly cfMediaBaseUrl = AppConstants.cloudflare.mediaBaseUrl;
   constructor(
     private readonly entityManager: EntityManager,
     @InjectModel(DeliveryRequest.name)
@@ -69,12 +73,13 @@ export class DeliveryService {
 
     const deliveries = await this.entityManager.query(query, [id]);
 
-    const modifiedDeliveries = deliveries.map((result) => {
+    const modifiedDeliveries = deliveries.map(async (result) => {
       if (result.order_type === OrderType.TRANSPORTATION_ONLY) {
         const {
           customer_id,
           customer_first_name,
           customer_last_name,
+          profile_image_cf_media_id,
           warehouse_id,
           warehouse_name,
           warehouse_branch_id,
@@ -82,11 +87,31 @@ export class DeliveryService {
           ...rest
         } = result;
 
+        let customer_image_url = null;
+
+        if (profile_image_cf_media_id != null) {
+          const cloudflare_id = await this.entityManager
+            .createQueryBuilder()
+            .select(['cf.cloudflare_id'])
+            .from('cf_media', 'cf')
+            .where('cf.id = :id', { id: profile_image_cf_media_id })
+            .getRawOne();
+
+            customer_image_url =
+            this.cfMediaBaseUrl +
+            '/' +
+            this.cfAccountHash +
+            '/' +
+            cloudflare_id.cloudflare_id +
+            '/' +
+            this.cfMediaVariant;
+        }
+
         return {
           order_from: {
             id: Number(customer_id),
             name: customer_first_name + ' ' + customer_last_name,
-            url: null,
+            url: customer_image_url || null,
           },
           ...rest,
           requestFrom: {
@@ -104,6 +129,7 @@ export class DeliveryService {
           warehouse_branch_name,
           ...rest
         } = result;
+        
         return {
           order_from: {
             id: Number(warehouse_branch_id),
