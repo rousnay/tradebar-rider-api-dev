@@ -26,13 +26,48 @@ import {
   export class UserPaymentHistoryController {
     constructor(private readonly userPaymentHistoryService: UserPaymentHistoryService) {}
   
+    @Get()
     @ApiOperation({ summary: 'Get all Payment history' })
     @ApiResponse({
       status: 200,
-      description: 'All Payment history',
-      type: [UserPaymentHistory],
+      description: 'Get the list of payment history',
+      content: {
+        'application/json': {
+          example: {
+            message: 'Payment history list fetched successfully',
+            status: 'success',
+            data: [
+              {
+                "id": 1,
+                "transaction_type": "credit",
+                "payment_status": "paid",
+                "payment_by": "customer",
+                "payment_for": "rider",
+                "payment_id": 132,
+                "customer_id": 22,
+                "warehouse_id": 1,
+                "rider_id": 25,
+                "order_id": 293,
+                "settlement_id": 1,
+                "fare_amount": 30,
+                "gst": 3,
+                "tradebar_fee": 3,
+                "net_balance": 100,
+                "payable_amount": 100,
+                "created_at": "2024-07-04T03:32:44.695Z",
+                "partial_paid_at": "2024-07-04T03:32:44.695Z",
+                "paid_at": "2024-07-04T03:32:44.000Z",
+                "failed_at": "2024-07-04T03:32:44.000Z",
+                "partial_refunded_at": "2024-07-04T03:32:44.000Z",
+                "refunded_at": "2024-07-04T03:32:44.000Z",
+                "settlement_at": "2024-07-04T03:32:44.000Z",
+                "updated_at": "2024-07-09T04:25:14.393Z"
+              },
+            ],
+          },
+        },
+      },
     })
-    @Get()
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('access_token')
     async findAll(): Promise<{
