@@ -34,6 +34,7 @@ export class DeliveryService {
       c.id as customer_id,
       c.first_name as customer_first_name,
       c.last_name as customer_last_name,
+      c.profile_image_cf_media_id as profile_image_cf_media_id,
       d.delivery_charge,
       d.shipping_status,
       d.accepted_at,
