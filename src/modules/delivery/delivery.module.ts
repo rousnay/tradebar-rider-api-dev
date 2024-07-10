@@ -15,9 +15,11 @@ import { DeliveryRequestController } from './delivery-request.controller';
 import { NotificationsModule } from '@modules/notification/notification.module';
 import { DeliveryRequestNotificationSchema } from '@modules/notification/notification.schema';
 import { DeliveryNotificationService } from './delivery.notification.service';
+import { ConfigModule } from '@config/config.module';
 
 @Module({
   imports: [
+    ConfigModule,
     LocationModule,
     NotificationsModule,
     TypeOrmModule.forFeature([DeliveryRequest]),
@@ -30,7 +32,11 @@ import { DeliveryNotificationService } from './delivery.notification.service';
     ]),
   ],
   exports: [DeliveryService, DeliveryRequestService],
-  providers: [DeliveryService, DeliveryRequestService, DeliveryNotificationService],
+  providers: [
+    DeliveryService,
+    DeliveryRequestService,
+    DeliveryNotificationService,
+  ],
   controllers: [DeliveryController, DeliveryRequestController],
 })
 export class DeliveryModule {}

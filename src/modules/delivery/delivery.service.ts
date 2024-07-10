@@ -7,18 +7,22 @@ import { Model } from 'mongoose';
 import { ShippingStatus } from '@common/enums/delivery.enum';
 import { OrderType } from '@common/enums/order.enum';
 import { AppConstants } from '@common/constants/constants';
+import { ConfigService } from '@config/config.service';
 
 @Injectable()
 export class DeliveryService {
-    private readonly cfAccountHash: string;
-    private readonly cfMediaVariant = AppConstants.cloudflare.mediaVariant;
-    private readonly cfMediaBaseUrl = AppConstants.cloudflare.mediaBaseUrl;
+  private readonly cfAccountHash: string;
+  private readonly cfMediaVariant = AppConstants.cloudflare.mediaVariant;
+  private readonly cfMediaBaseUrl = AppConstants.cloudflare.mediaBaseUrl;
   constructor(
     private readonly entityManager: EntityManager,
     @InjectModel(DeliveryRequest.name)
     private deliveryRequestModel: Model<DeliveryRequest>,
     private locationService: LocationService,
-  ) {}
+    private configService: ConfigService,
+  ) {
+    this.cfAccountHash = configService.cloudflareAccountHash;
+  }
 
   async findAll(req: any): Promise<any[]> {
     const { id } = req.user;
@@ -74,7 +78,7 @@ export class DeliveryService {
 
     const deliveries = await this.entityManager.query(query, [id]);
 
-    const modifiedDeliveries = deliveries.map(async (result) => {
+    const modifiedDeliveries = deliveries.map((result) => {
       if (result.order_type === OrderType.TRANSPORTATION_ONLY) {
         const {
           customer_id,
@@ -88,37 +92,32 @@ export class DeliveryService {
           ...rest
         } = result;
 
-        let customer_image_url = null;
+        // let customer_image_url = null;
 
-        if (profile_image_cf_media_id != null) {
-          const cloudflare_id = await this.entityManager
-            .createQueryBuilder()
-            .select(['cf.cloudflare_id'])
-            .from('cf_media', 'cf')
-            .where('cf.id = :id', { id: profile_image_cf_media_id })
-            .getRawOne();
+        // if (profile_image_cf_media_id != null) {
+        //   const cloudflare_id = await this.entityManager
+        //     .createQueryBuilder()
+        //     .select(['cf.cloudflare_id'])
+        //     .from('cf_media', 'cf')
+        //     .where('cf.id = :id', { id: profile_image_cf_media_id })
+        //     .getRawOne();
 
-            customer_image_url =
-            this.cfMediaBaseUrl +
-            '/' +
-            this.cfAccountHash +
-            '/' +
-            cloudflare_id.cloudflare_id +
-            '/' +
-            this.cfMediaVariant;
-        }
+        //   customer_image_url =
+        //     this.cfMediaBaseUrl +
+        //     '/' +
+        //     this.cfAccountHash +
+        //     '/' +
+        //     cloudflare_id.cloudflare_id +
+        //     '/' +
+        //     this.cfMediaVariant;
+        // }
 
         return {
-          order_from: {
-            id: Number(customer_id),
-            name: customer_first_name + ' ' + customer_last_name,
-            url: customer_image_url || null,
-          },
           ...rest,
           requestFrom: {
             id: customer_id,
             name: `${customer_first_name} ${customer_last_name}`,
-            url: null,
+            // url: customer_image_url,
           },
         };
       } else {
@@ -130,18 +129,34 @@ export class DeliveryService {
           warehouse_branch_name,
           ...rest
         } = result;
-        
+
+        // let logo_url = null;
+
+        // const logo_cloudflare_id_query = `SELECT cf.cloudflare_id
+        // FROM cf_media cf
+        // WHERE cf.model = 'App\\\\Models\\\\Warehouse' AND cf.image_type = 'logo' AND cf.model_id = ?`;
+
+        // const logo = await this.entityManager.query(logo_cloudflare_id_query, [
+        //   result.warehouse_id,
+        // ]);
+
+        // if (logo.length != 0 && logo[0].cloudflare_id != null) {
+        //   logo_url =
+        //     this.cfMediaBaseUrl +
+        //     '/' +
+        //     this.cfAccountHash +
+        //     '/' +
+        //     logo[0].cloudflare_id +
+        //     '/' +
+        //     this.cfMediaVariant;
+        // }
+
         return {
-          order_from: {
-            id: Number(warehouse_branch_id),
-            name: warehouse_branch_name,
-            url: null,
-          },
           ...rest,
           requestFrom: {
             id: Number(warehouse_branch_id),
             name: warehouse_branch_name,
-            url: null,
+            // url: logo_url,
           },
         };
       }
