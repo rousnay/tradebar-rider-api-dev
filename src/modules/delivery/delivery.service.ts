@@ -81,7 +81,13 @@ export class DeliveryService {
           warehouse_branch_name,
           ...rest
         } = result;
+
         return {
+          order_from: {
+            id: Number(customer_id),
+            name: customer_first_name + ' ' + customer_last_name,
+            url: null,
+          },
           ...rest,
           requestFrom: {
             id: customer_id,
@@ -91,13 +97,19 @@ export class DeliveryService {
         };
       } else {
         const {
-          // warehouse_id,
-          // warehouse_name,
+          customer_id,
+          customer_first_name,
+          customer_last_name,
           warehouse_branch_id,
           warehouse_branch_name,
           ...rest
         } = result;
         return {
+          order_from: {
+            id: Number(warehouse_branch_id),
+            name: warehouse_branch_name,
+            url: null,
+          },
           ...rest,
           requestFrom: {
             id: Number(warehouse_branch_id),
@@ -113,6 +125,7 @@ export class DeliveryService {
       if (!order) {
         order = {
           id: row.id,
+          order_from: row.order_from,
           order_id: row.order_id,
           order_type: row.order_type,
           shipping_status: row.shipping_status,
