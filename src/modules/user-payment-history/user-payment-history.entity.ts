@@ -81,6 +81,9 @@ export class UserPaymentHistory {
   @Column({ nullable: true })
   payable_amount: number;
 
+  @Column({ nullable: true })
+  settlement_amount: number;
+
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
 
