@@ -108,6 +108,46 @@ import {
             
         };
     }
+
+    @Get('/todays-earnings')
+    @ApiOperation({ summary: 'Todays earning history' })
+    @ApiResponse({
+      status: 200,
+      description: 'Get todays earning history',
+      content: {
+        'application/json': {
+          example: {
+            message: 'Todays earning history fetched successfully',
+            status: 'success',
+            data: [
+                {
+                    "status": "success",
+                    "message": "Todays earning history has been fetched successfully",
+                    "data": {
+                        "total_trips": 7,
+                        "total_distance": '5 km',
+                        "total_earnings": 231,
+                        "total_trip_time": "Hour 1, Minute 10"
+                    }
+                }
+            ],
+          },
+        },
+      },
+    })
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('access_token')
+    async earnedToday(): Promise<{}> {
+        const today_earnings = await this.userPaymentHistoryService.findTodaysEarning();
+
+      
+        return {
+            status: 'success',
+            message: 'All Payment history has been fetched successfully',
+            data: today_earnings,
+            
+        };
+    }
   
   }
   
