@@ -19,39 +19,36 @@ export class UserPaymentHistoryService {
 
   async findAll(): Promise<UserPaymentHistory[]> {
     const rider_id = this.request['user'].id;
-    let histories = this.userPaymentHistoryRepository.find({
-      where: { rider_id: rider_id }
+    const payment_history = this.userPaymentHistoryRepository.find({
+      where: { rider_id: rider_id },
     });
 
-    return histories;
+    return payment_history;
   }
 
-    async findTodaysEarning(): Promise<any> {
-        const rider_id = this.request['user'].id;
-        const result = await this.entityManager.query(
-            `SELECT * from deliveries WHERE shipping_status='delivered' AND rider_id = ?`,
-            [rider_id],
-        );
+  async findTodaysEarning(): Promise<any> {
+    const rider_id = this.request['user'].id;
+    const result = await this.entityManager.query(
+      `SELECT * from deliveries WHERE shipping_status='delivered' AND rider_id = ?`,
+      [rider_id],
+    );
 
-        let total_trips = result.length > 0 ? result.length : 0;
-        let total_distance = 0;
-        let total_earnings = 0;
-        let total_trip_time = 0;
+    const total_trips = result.length > 0 ? result.length : 0;
+    let total_distance = 0;
+    let total_earnings = 0;
+    let total_trip_time = 0;
 
-        result.filter(item => {
-            total_distance += item.init_distance;
-            total_earnings += item.delivery_charge;
-            total_trip_time += item.init_duration;
-        })      
+    result.filter((item) => {
+      total_distance += item.init_distance;
+      total_earnings += item.delivery_charge;
+      total_trip_time += item.init_duration;
+    });
 
-        return {
-            total_trips:total_trips,
-            total_distance:total_distance,
-            total_earnings:total_earnings,
-            total_trip_time:total_trip_time
-        };
-
-        
-    }
-
+    return {
+      total_trips: total_trips,
+      total_distance: total_distance,
+      total_earnings: total_earnings,
+      total_trip_time: total_trip_time,
+    };
+  }
 }
