@@ -203,6 +203,10 @@ export class DeliveryRequestService {
     } else if (status === ShippingStatus.DELIVERED) {
       timestampField = 'delivered_at';
       orderStatus = 'delivered';
+
+      //Trigger payment process
+
+      //......
     } else if (status === ShippingStatus.CANCELLED) {
       timestampField = 'cancelled_at';
       orderStatus = 'cancelled';

@@ -63,8 +63,8 @@ export class UserPaymentHistory {
   @Column({ nullable: true })
   order_id: number;
 
-  @Column({ nullable: true })
-  settlement_id: number;
+  // @Column({ nullable: true })
+  // settlement_id: number;
 
   @Column({ nullable: true })
   fare_amount: number;
@@ -83,6 +83,15 @@ export class UserPaymentHistory {
 
   @Column({ nullable: true })
   settlement_amount: number;
+
+  @Column({ nullable: true })
+  refund_amount: number;
+
+  @Column({ nullable: true })
+  remarks: string;
+
+  @Column({ nullable: true })
+  cf_media_id: number;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
