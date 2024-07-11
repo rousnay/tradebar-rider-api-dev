@@ -125,9 +125,9 @@ import {
                     "message": "Todays earning history has been fetched successfully",
                     "data": {
                         "total_trips": 7,
-                        "total_distance": '5 km',
+                        "total_distance": 5,
                         "total_earnings": 231,
-                        "total_trip_time": "Hour 1, Minute 10"
+                        "total_trip_time": 10
                     }
                 }
             ],

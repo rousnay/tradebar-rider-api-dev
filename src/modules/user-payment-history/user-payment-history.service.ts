@@ -29,7 +29,7 @@ export class UserPaymentHistoryService {
     async findTodaysEarning(): Promise<any> {
         const rider_id = this.request['user'].id;
         const result = await this.entityManager.query(
-            'SELECT * from deliveries WHERE rider_id = ?',
+            `SELECT * from deliveries WHERE shipping_status='delivered' AND rider_id = ?`,
             [rider_id],
         );
 
@@ -43,16 +43,12 @@ export class UserPaymentHistoryService {
             total_earnings += item.delivery_charge;
             total_trip_time += item.init_duration;
         })      
-        
-        let hours = Math.trunc(70/60);
-        let minutes = 70 % 60;
-        // console.log(hours +":"+ minutes);
 
         return {
             total_trips:total_trips,
-            total_distance:total_distance+" Km",
+            total_distance:total_distance,
             total_earnings:total_earnings,
-            total_trip_time:'Hour '+hours+", Minute "+minutes,
+            total_trip_time:total_trip_time
         };
 
         
