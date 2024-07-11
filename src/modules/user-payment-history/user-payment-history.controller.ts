@@ -70,11 +70,7 @@ import {
     })
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('access_token')
-    async findAll(): Promise<{
-      status: string;
-      message: string;
-      data: UserPaymentHistory[];
-    }> {
+    async findAll(): Promise<{}> {
         const paymentHistory = await this.userPaymentHistoryService.findAll();
         //   console.log('paymentHistory',paymentHistory);
         let total_balance = 0;
@@ -86,17 +82,30 @@ import {
                 total_balance += item.net_balance - item.tradebar_fee
             }
 
-            // if(item.transaction_type == 'debit'){
-            //     debit_balance += item.net_balance
-            // }
+            if(item.transaction_type == 'debit'){
+                debit_balance += item.settlement_amount
+            }
         })
 
-        
+        let reversedArray = paymentHistory.reverse();
+        reversedArray.find((item)=>{
+            if(item.transaction_type == 'debit'){
+                last_withdraw = item.settlement_amount;
+            }
+        })
+
+        let res_obj = {
+            total_balance:total_balance,
+            debit_balance:debit_balance,
+            last_withdraw:last_withdraw,
+            histories:paymentHistory
+        }
       
         return {
             status: 'success',
             message: 'All Payment history has been fetched successfully',
-            data: paymentHistory,
+            data: res_obj,
+            
         };
     }
   
