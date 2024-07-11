@@ -108,7 +108,7 @@ export class UserPaymentHistoryController {
   })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access_token')
-  async findAll(): Promise<{}> {
+  async findAll(): Promise<any> {
     const paymentHistory = await this.userPaymentHistoryService.findAll();
     //   console.log('paymentHistory',paymentHistory);
     let total_balance = 0;
