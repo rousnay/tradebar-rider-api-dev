@@ -15,9 +15,11 @@ export class UserPaymentHistoryService {
 
   async findAll(): Promise<UserPaymentHistory[]> {
     const rider_id = this.request['user'].id;
-    return this.userPaymentHistoryRepository.find({
+    let histories = this.userPaymentHistoryRepository.find({
       where: { rider_id: rider_id }
     });
+
+    return histories;
   }
 
 }

@@ -21,7 +21,7 @@ import {
 //   import { CreateUserPaymentInfoDto } from './dtos/create-user-payment-history.dto';
   import { JwtAuthGuard } from '@core/guards/jwt-auth.guard';
   
-  @ApiTags("Payment History")
+  @ApiTags("Payments")
   @Controller('payment-history')
   export class UserPaymentHistoryController {
     constructor(private readonly userPaymentHistoryService: UserPaymentHistoryService) {}
@@ -75,14 +75,29 @@ import {
       message: string;
       data: UserPaymentHistory[];
     }> {
-      const paymentHistory = await this.userPaymentHistoryService.findAll();
-      console.log('paymentHistory',paymentHistory);
+        const paymentHistory = await this.userPaymentHistoryService.findAll();
+        //   console.log('paymentHistory',paymentHistory);
+        let total_balance = 0;
+        let debit_balance = 0;
+        let last_withdraw = 0;
+
+        paymentHistory.filter(item => {
+            if(item.transaction_type == 'credit'){
+                total_balance += item.net_balance - item.tradebar_fee
+            }
+
+            // if(item.transaction_type == 'debit'){
+            //     debit_balance += item.net_balance
+            // }
+        })
+
+        
       
-      return {
-        status: 'success',
-        message: 'All Payment history has been fetched successfully',
-        data: paymentHistory,
-      };
+        return {
+            status: 'success',
+            message: 'All Payment history has been fetched successfully',
+            data: paymentHistory,
+        };
     }
   
   }
