@@ -39,10 +39,9 @@ export class UserPaymentHistoryController {
           message: 'Payment history list fetched successfully',
           status: 'success',
           data: {
-            total_balance: 48,
-            debit_balance: 40,
-            last_withdraw: 20,
-            history: [
+            current_balance: 48,
+            last_settlement_amount: 20,
+            payment_history: [
               {
                 id: 8,
                 transaction_type: 'debit',
@@ -114,7 +113,7 @@ export class UserPaymentHistoryController {
     //   console.log('paymentHistory',paymentHistory);
     let total_balance = 0;
     // let debit_balance = 0;
-    let last_withdraw = 0;
+    let last_settlement_amount = 0;
 
     paymentHistory.filter((item) => {
       if (item.transaction_type == 'credit') {
@@ -129,15 +128,15 @@ export class UserPaymentHistoryController {
     const reversedArray = paymentHistory.reverse();
     reversedArray.find((item) => {
       if (item.transaction_type == 'debit') {
-        last_withdraw = item.settlement_amount;
+        last_settlement_amount = item.settlement_amount;
       }
     });
 
     const res_obj = {
-      total_balance: total_balance,
+      current_balance: total_balance,
       // debit_balance: debit_balance,
-      last_withdraw: last_withdraw,
-      history: paymentHistory,
+      last_settlement_amount: last_settlement_amount,
+      payment_history: paymentHistory,
     };
 
     return {
