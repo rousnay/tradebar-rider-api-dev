@@ -7,7 +7,6 @@ import Stripe from 'stripe';
 import { ConfigService } from '@config/config.service';
 import { AppConstants } from '@common/constants/constants';
 import { DeliveryService } from '@modules/delivery/delivery.service';
-import { RetrievePaymentMethodDto } from '../dtos/retrieve-payment-method.dto';
 import { NotificationService } from '@modules/notification/notification.service'; // TODO: Remove this service
 import { DeliveryRequestService } from '@modules/delivery/delivery-request.service';
 
@@ -28,28 +27,92 @@ export class PaymentService {
     });
   }
 
-  async findOrCreateCustomer(
-    email: string,
-    name: string,
-    phone: string,
-  ): Promise<Stripe.Customer> {
-    // Find existing customer by email
-    const customers = await this.stripe.customers.list({
-      email: email,
-      limit: 1,
-    });
+  async makePayment(
+    deliveryId: number,
+    order: any,
+  ): Promise<{
+    status: string;
+    message: string;
+    data: Stripe.PaymentIntent | null;
+  }> {
+    const user = this.request['user'];
+    const userEmail = user.email;
 
-    if (customers.data.length > 0) {
-      // Customer with email exists
-      return customers.data[0];
-    } else {
-      // Customer with email does not exist, create a new customer
-      const customer = await this.stripe.customers.create({
-        email: email,
-        name: name,
-        phone: phone,
+    const amount = order?.payable_amount * 100;
+
+    if (!userEmail) {
+      return {
+        status: 'error',
+        message: 'User email not found',
+        data: null,
+      };
+    }
+
+    const customerDetails = await this.entityManager.query(
+      'SELECT * FROM users WHERE email = ? LIMIT 1',
+      [userEmail],
+    );
+
+    if (customerDetails.length === 0) {
+      return {
+        status: 'error',
+        message: 'Customer not found',
+        data: null,
+      };
+    }
+
+    const customerStripeId = customerDetails[0]?.stripe_id;
+    if (!customerStripeId) {
+      return {
+        status: 'error',
+        message: 'Customer stripe ID not found',
+        data: null,
+      };
+    }
+
+    try {
+      const customer = await this.stripe.customers.retrieve(customerStripeId);
+
+      if ((customer as Stripe.DeletedCustomer).deleted) {
+        return {
+          status: 'error',
+          message: 'Customer has been deleted',
+          data: null,
+        };
+      }
+
+      const activeCustomer = customer as Stripe.Customer;
+
+      const defaultPaymentMethod =
+        activeCustomer.invoice_settings.default_payment_method;
+      if (!defaultPaymentMethod) {
+        return {
+          status: 'error',
+          message: 'No default payment method set',
+          data: null,
+        };
+      }
+
+      const paymentIntent = await this.stripe.paymentIntents.create({
+        amount,
+        currency: 'aud',
+        customer: customerStripeId,
+        payment_method: defaultPaymentMethod as string,
+        off_session: true,
+        confirm: true,
       });
-      return customer;
+
+      return {
+        status: 'success',
+        message: 'Charge successful',
+        data: paymentIntent,
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        message: error.message,
+        data: null,
+      };
     }
   }
 
@@ -134,20 +197,23 @@ export class PaymentService {
 
         if (payment) {
           console.log('updatePaymentStatus operated successfully');
-          const riderDeviceTokens =
-            await this.deliveryService.sendDeliveryRequest(stripe_id);
+          // const riderDeviceTokens =
+          //   await this.deliveryService.sendDeliveryRequest(stripe_id);
 
-          const buildDeliveryRequestPayload =
-            await this.deliveryRequestService.getDeliveryRequestPayloadByStripeId(
-              stripe_id,
-            );
+          // const buildDeliveryRequestPayload =
+          //   await this.deliveryRequestService.getDeliveryRequestPayloadByStripeId(
+          //     stripe_id,
+          //   );
 
-          const getDeliveryRequestData =
-            await this.deliveryRequestService.create(
-              buildDeliveryRequestPayload,
-            );
+          // const getDeliveryRequestData =
+          //   await this.deliveryRequestService.create(
+          //     buildDeliveryRequestPayload,
+          //   );
 
           //NEED TO CHANGE DELIVERY STATUS TO SEARCHING...
+
+          const riderDeviceTokens = [];
+          const getDeliveryRequestData = null;
 
           const requestedByUserId = getDeliveryRequestData?.requestFrom?.id;
           const requestedByUserName = getDeliveryRequestData?.requestFrom?.name;
@@ -186,6 +252,30 @@ export class PaymentService {
     }
   }
 
+  async findOrCreateCustomer(
+    email: string,
+    name: string,
+    phone: string,
+  ): Promise<Stripe.Customer> {
+    // Find existing customer by email
+    const customers = await this.stripe.customers.list({
+      email: email,
+      limit: 1,
+    });
+
+    if (customers.data.length > 0) {
+      // Customer with email exists
+      return customers.data[0];
+    } else {
+      // Customer with email does not exist, create a new customer
+      const customer = await this.stripe.customers.create({
+        email: email,
+        name: name,
+        phone: phone,
+      });
+      return customer;
+    }
+  }
   async createCheckoutSession(order: any): Promise<Stripe.Checkout.Session> {
     const user = this.request['user'];
     const customer = await this.findOrCreateCustomer(
@@ -252,28 +342,6 @@ export class PaymentService {
         amount: order?.payable_amount * 100,
         currency: 'aud',
         customer: customer?.id, // Reference the customer ID
-        // metadata: {
-        //   order_id: order?.order_id,
-        //   pickup_address_coordinates: order?.pickup_address_coordinates,
-        //   shipping_address_coordinates: order?.shipping_address_coordinates,
-        // },
-        // shipping: {
-        //   name:
-        //     order?.shipping_address?.first_name +
-        //     ' ' +
-        //     order?.shipping_address?.last_name,
-        //   address: {
-        //     line1: order?.shipping_address?.line1,
-        //     line2: order?.shipping_address?.line2,
-        //     city: order?.shipping_address.address?.city,
-        //     state: order?.shipping_address?.state,
-        //     postal_code: order?.shipping_address?.postal_code,
-        //     country: order?.shipping_address?.country,
-        //   },
-        //   phone: order?.shipping_address?.phone,
-        //   carrier: 'CGP Transportation',
-        //   tracking_number: order?.shipping_address?.tracking_number,
-        // },
       });
 
       // Return the payment intent

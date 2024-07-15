@@ -12,8 +12,7 @@ import {
 import { ApiOperation, ApiBody, ApiTags } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '@core/guards/jwt-auth.guard';
-import { RetrievePaymentMethodDto } from '../dtos/retrieve-payment-method.dto';
-import { PaymentService } from '../services/payments.service';
+import { PaymentService } from './payments.service';
 
 @Controller('payment')
 @ApiTags('Payments')
@@ -44,13 +43,5 @@ export class PaymentController {
       payment_status,
       true,
     );
-  }
-
-  @Put('send-transportation-request/:stripe_id')
-  @ApiOperation({ summary: 'PLEASE IGNORE! Only for backend' })
-  async requestTransportation(
-    @Param('stripe_id') stripe_id: string,
-  ): Promise<number> {
-    return this.paymentService.updatePaymentStatus(stripe_id, 'Paid', true);
   }
 }
