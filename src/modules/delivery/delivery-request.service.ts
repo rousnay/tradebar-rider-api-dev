@@ -15,6 +15,7 @@ import {
   DeliveryRequestNotificationModel,
 } from '@modules/notification/notification.schema';
 import { DeliveryNotificationService } from './delivery.notification.service';
+import { DeliveryPaymentService } from './delivery-payment.service';
 
 @Injectable()
 export class DeliveryRequestService {
@@ -26,6 +27,7 @@ export class DeliveryRequestService {
     @InjectModel(DeliveryRequestNotificationModel.modelName)
     private deliveryRequestNotificationModel: Model<DeliveryRequestNotification>,
     private deliveryNotificationService: DeliveryNotificationService,
+    private deliveryPaymentService: DeliveryPaymentService,
   ) {}
 
   async findAll(): Promise<DeliveryRequest[]> {
@@ -45,7 +47,10 @@ export class DeliveryRequestService {
     return this.deliveryRequestModel.findById(id).exec();
   }
 
-  async acceptDeliveryRequest(req: any, id: string): Promise<DeliveryRequest> {
+  async acceptDeliveryRequest(
+    req: any,
+    deliveryRequestId: string,
+  ): Promise<DeliveryRequest> {
     const rider = req.user;
     console.log('Rider #:', rider);
 
@@ -63,7 +68,9 @@ export class DeliveryRequestService {
     };
 
     const updatedDeliveryRequest = await this.deliveryRequestModel
-      .findByIdAndUpdate(id, updateFields, { new: true })
+      .findByIdAndUpdate({ _id: deliveryRequestId }, updateFields, {
+        new: true,
+      })
       .exec();
 
     console.log('updatedDeliveryRequest:', updatedDeliveryRequest);
@@ -157,26 +164,28 @@ export class DeliveryRequestService {
 
   async updateDeliveryRequestStatus(
     req: any,
-    id: string,
+    deliveryRequestId: string,
     status: ShippingStatus,
   ): Promise<DeliveryRequest> {
-    // const deliveryRequest = await this.deliveryRequestModel.findById(id).exec();
+    // const deliveryRequest = await this.deliveryRequestModel.findById(deliveryId).exec();
 
     const updateFields = {
       status: status,
       updatedAt: new Date(),
     };
 
-    if (status === ShippingStatus.CANCELLED) {
-      updateFields['cancelledAt'] = new Date();
-    }
-
     const updatedDeliveryRequest = await this.deliveryRequestModel
-      .findByIdAndUpdate(id, updateFields, { new: true })
+      .findByIdAndUpdate({ _id: deliveryRequestId }, updateFields, {
+        new: true,
+      })
       .exec();
 
     if (!updatedDeliveryRequest) {
       throw new NotFoundException('Delivery request not found');
+    }
+
+    if (status === ShippingStatus.CANCELLED) {
+      updateFields['cancelledAt'] = new Date(); // set cancelled_at timestamp
     }
 
     const rider = req.user;
@@ -205,6 +214,10 @@ export class DeliveryRequestService {
       orderStatus = 'delivered';
 
       //Trigger payment process
+      const deliveryPayment = await this.deliveryPaymentService.makePayment(
+        updatedDeliveryRequest.deliveryId,
+      );
+      console.log('Delivery Payment:', deliveryPayment);
 
       //......
     } else if (status === ShippingStatus.CANCELLED) {

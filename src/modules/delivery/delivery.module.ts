@@ -16,6 +16,8 @@ import { NotificationsModule } from '@modules/notification/notification.module';
 import { DeliveryRequestNotificationSchema } from '@modules/notification/notification.schema';
 import { DeliveryNotificationService } from './delivery.notification.service';
 import { ConfigModule } from '@config/config.module';
+import { DeliveryPaymentService } from './delivery-payment.service';
+// import { NotificationService } from '@modules/notification/notification.service';
 
 @Module({
   imports: [
@@ -31,11 +33,13 @@ import { ConfigModule } from '@config/config.module';
       },
     ]),
   ],
-  exports: [DeliveryService, DeliveryRequestService],
+  exports: [DeliveryService, DeliveryRequestService, DeliveryPaymentService],
   providers: [
     DeliveryService,
     DeliveryRequestService,
     DeliveryNotificationService,
+    DeliveryPaymentService,
+    // NotificationService,
   ],
   controllers: [DeliveryController, DeliveryRequestController],
 })
