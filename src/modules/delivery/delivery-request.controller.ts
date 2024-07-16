@@ -123,7 +123,7 @@ export class DeliveryRequestController {
   @ApiProperty({ enum: ShippingStatus, description: 'Shipping status' })
   async updateDeliveryRequestStatus(
     @Request() req,
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Query('status') status?: ShippingStatus,
   ): Promise<{ status: string; message: string; data: DeliveryRequest }> {
     const updatedDeliveryRequest =

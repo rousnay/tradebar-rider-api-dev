@@ -11,6 +11,11 @@ export enum ShippingStatus {
   // IN_TRANSIT = 'in_transit',
 }
 
+// export type UpdateShippingStatus = Exclude<
+//   ShippingStatus,
+//   ShippingStatus.ACCEPTED
+// >;
+
 // export enum DeliveryStatus {
 //   SEARCHING = 'searching',
 //   ACCEPTED = 'accepted',

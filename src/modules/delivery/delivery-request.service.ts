@@ -47,7 +47,10 @@ export class DeliveryRequestService {
     return this.deliveryRequestModel.findById(id).exec();
   }
 
-  async acceptDeliveryRequest(req: any, id: string): Promise<DeliveryRequest> {
+  async acceptDeliveryRequest(
+    req: any,
+    deliveryRequestId: string,
+  ): Promise<DeliveryRequest> {
     const rider = req.user;
     console.log('Rider #:', rider);
 
@@ -65,7 +68,9 @@ export class DeliveryRequestService {
     };
 
     const updatedDeliveryRequest = await this.deliveryRequestModel
-      .findByIdAndUpdate(id, updateFields, { new: true })
+      .findByIdAndUpdate({ _id: deliveryRequestId }, updateFields, {
+        new: true,
+      })
       .exec();
 
     console.log('updatedDeliveryRequest:', updatedDeliveryRequest);
@@ -159,7 +164,7 @@ export class DeliveryRequestService {
 
   async updateDeliveryRequestStatus(
     req: any,
-    deliveryRequestId: number,
+    deliveryRequestId: string,
     status: ShippingStatus,
   ): Promise<DeliveryRequest> {
     // const deliveryRequest = await this.deliveryRequestModel.findById(deliveryId).exec();
@@ -170,7 +175,9 @@ export class DeliveryRequestService {
     };
 
     const updatedDeliveryRequest = await this.deliveryRequestModel
-      .findByIdAndUpdate(deliveryRequestId, updateFields, { new: true })
+      .findByIdAndUpdate({ _id: deliveryRequestId }, updateFields, {
+        new: true,
+      })
       .exec();
 
     if (!updatedDeliveryRequest) {
