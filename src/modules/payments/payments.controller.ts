@@ -19,29 +19,29 @@ import { PaymentService } from './payments.service';
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
-  @Put('update-payment-status')
-  @ApiOperation({ summary: 'PLEASE IGNORE! Only for backend (webhook)' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        stripe_id: {
-          type: 'string',
-          example:
-            'cs_test_a1ZPTibt206umm3NxH9MSIPr4EL2LCcot5UVpgpwZNM0vYMiWjwdfn7h7I',
-        },
-        payment_status: { type: 'string', example: 'Paid' },
-      },
-    },
-  })
-  async updatePaymentStatus(
-    @Body('stripe_id') stripe_id: string,
-    @Body('payment_status') payment_status: string,
-  ): Promise<number> {
-    return this.paymentService.updatePaymentStatus(
-      stripe_id,
-      payment_status,
-      true,
-    );
-  }
+  // @Put('update-payment-status')
+  // @ApiOperation({ summary: 'PLEASE IGNORE! Only for backend (webhook)' })
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       stripe_id: {
+  //         type: 'string',
+  //         example:
+  //           'cs_test_a1ZPTibt206umm3NxH9MSIPr4EL2LCcot5UVpgpwZNM0vYMiWjwdfn7h7I',
+  //       },
+  //       payment_status: { type: 'string', example: 'Paid' },
+  //     },
+  //   },
+  // })
+  // async updatePaymentStatus(
+  //   @Body('stripe_id') stripe_id: string,
+  //   @Body('payment_status') payment_status: string,
+  // ): Promise<number> {
+  //   return this.paymentService.updatePaymentStatus(
+  //     stripe_id,
+  //     payment_status,
+  //     true,
+  //   );
+  // }
 }

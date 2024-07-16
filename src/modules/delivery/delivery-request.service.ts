@@ -215,10 +215,12 @@ export class DeliveryRequestService {
 
       //Trigger payment process
       const deliveryPayment = await this.deliveryPaymentService.makePayment(
-        updatedDeliveryRequest.deliveryId,
+        updatedDeliveryRequest.requestFrom.userId,
+        updatedDeliveryRequest.orderId,
+        updatedDeliveryRequest.stripeId,
+        updatedDeliveryRequest.deliveryCost,
       );
       console.log('Delivery Payment:', deliveryPayment);
-
       //......
     } else if (status === ShippingStatus.CANCELLED) {
       timestampField = 'cancelled_at';
