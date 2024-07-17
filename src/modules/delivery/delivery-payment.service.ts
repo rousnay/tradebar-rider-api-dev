@@ -8,7 +8,13 @@ import { ConfigService } from '@config/config.service';
 import { AppConstants } from '@common/constants/constants';
 import { NotificationService } from '@modules/notification/notification.service';
 import { OrderType } from '@common/enums/order.enum';
-import { PaymentStatus } from '@common/enums/payment.enum';
+import {
+  PaymentStatus,
+  PaymentTransactionType,
+} from '@common/enums/payment.enum';
+import { UserType } from '@common/enums/user.enum';
+import { UserPaymentHistoryService } from '@modules/user-payment-history/user-payment-history.service';
+import { CreateUserPaymentHistoryForDeliveryDto } from '@modules/user-payment-history/dtos/create-user-payment-history-for-delivery.dto';
 
 @Injectable()
 export class DeliveryPaymentService {
@@ -19,6 +25,7 @@ export class DeliveryPaymentService {
     private readonly entityManager: EntityManager,
     private readonly configService: ConfigService,
     private readonly notificationService: NotificationService,
+    private readonly userPaymentHistoryService: UserPaymentHistoryService,
   ) {
     this.stripe = new Stripe(configService.stripeSecretKey, {
       apiVersion: AppConstants.stripe.apiVersion,
@@ -71,7 +78,12 @@ export class DeliveryPaymentService {
       });
 
       //Update payment status
-      await this.updatePaymentStatus(userId, orderId, paymentIntent.id, 'Paid');
+      await this.updatePaymentStatus(
+        userId,
+        orderId,
+        paymentIntent.id,
+        paymentIntent.status,
+      );
 
       return {
         status: 'success',
@@ -79,6 +91,9 @@ export class DeliveryPaymentService {
         data: paymentIntent,
       };
     } catch (error) {
+      //Update payment status
+      // await this.updatePaymentStatus(userId, orderId, null, 'Cancelled');
+
       return {
         status: 'error',
         message: error.message,
@@ -91,7 +106,7 @@ export class DeliveryPaymentService {
     userId: number,
     orderId: number,
     stripe_id: string,
-    payment_status: string,
+    status: string,
   ): Promise<any> {
     try {
       console.log('updatePaymentStatus called');
@@ -103,208 +118,129 @@ export class DeliveryPaymentService {
         'stripe_id',
         stripe_id,
         'payment_status',
-        payment_status,
+        status,
       );
-      // const updateResult = await this.entityManager;
+
+      if (!stripe_id) {
+        return null;
+      }
+      // const { rider_id, fare_amount, payable_amount, created_at } = await this.entityManager.query(
+      //   'SELECT rider_id, fare_amount, payable_amount, created_at FROM deliveries WHERE id = ?',
+      //   [orderId],
+      // )
+
+      let payment_status = null;
+
+      if (status === 'succeeded') {
+        payment_status = 'Paid';
+      } else if (status === 'canceled') {
+        payment_status = 'Cancelled';
+        // } else if (status === 'requires_action') {
+        //   payment_status = 'Failed';
+        // } else if (status === 'requires_payment_method') {
+        //   payment_status = 'Failed';
+        // } else if (status === 'requires_capture') {
+        //   payment_status = 'Failed';
+        // } else if (status === 'processing') {
+        //   payment_status = 'Failed';
+        // } else if (status === 'requires_confirmation') {
+        //   payment_status = 'Failed';
+        // } else if (status === 'requires_source') {
+        //   payment_status = 'Failed';
+      } else {
+        payment_status = 'Failed';
+      }
+
       await this.entityManager
         .createQueryBuilder()
         .update('payments')
-        .set({ payment_status })
-        .set({ stripe_id })
-        .andWhere('payment_status != :payment_status', { payment_status })
+        .set({ payment_status, stripe_id, updated_at: new Date() })
+        .where('order_id = :orderId', { orderId })
+        // .andWhere('payment_status != :payment_status', { payment_status })
         .execute();
 
-      if (payment_status === 'Paid') {
-        const payment = await this.entityManager
+      const payment = await this.entityManager
+        .createQueryBuilder()
+        .select('*')
+        .from('payments', 'p')
+        .where('p.stripe_id = :stripe_id', {
+          stripe_id,
+        })
+        .getRawOne();
+
+      console.log('payment', payment);
+
+      if (payment) {
+        console.log('updatePaymentStatus after PAID operated successfully');
+
+        const order = await this.entityManager
           .createQueryBuilder()
           .select('*')
-          .from('payments', 'p')
-          .where('p.stripe_id = :stripe_id', {
-            stripe_id,
-          })
+          .from('orders', 'o')
+          .where('o.id = :orderId', { orderId })
           .getRawOne();
 
-        if (payment) {
-          console.log('updatePaymentStatus after PAID operated successfully');
-          // const riderDeviceTokens =
-          //   await this.deliveryService.sendDeliveryRequest(stripe_id);
+        const delivery = await this.entityManager
+          .createQueryBuilder()
+          .select('*')
+          .from('deliveries', 'd')
+          .where('d.order_id = :orderId', { orderId })
+          .getRawOne();
 
-          // const buildDeliveryRequestPayload =
-          //   await this.deliveryRequestService.getDeliveryRequestPayloadByStripeId(
-          //     stripe_id,
-          //   );
+        const tradebar_percentage = 0.1;
+        let payment_by = null;
+        let customer_id = null;
+        let warehouse_id = null;
 
-          // const getDeliveryRequestData =
-          //   await this.deliveryRequestService.create(
-          //     buildDeliveryRequestPayload,
-          //   );
-
-          //NEED TO CHANGE DELIVERY STATUS TO SEARCHING...
-
-          // const riderDeviceTokens = [];
-          // const getDeliveryRequestData = null;
-
-          // const requestedByUserId = getDeliveryRequestData?.requestFrom?.id;
-          // const requestedByUserName = getDeliveryRequestData?.requestFrom?.name;
-          // const requestId = getDeliveryRequestData?.id;
-          // const title = 'New Delivery Request';
-          // const message =
-          //   'You have a new delivery request from ' + requestedByUserName;
-          // const data = {
-          //   target: 'rider',
-          //   type: 'delivery_request',
-          //   requestId: requestId,
-          //   requestedByUserId: requestedByUserId.toString(),
-          //   requestedByUserName: requestedByUserName,
-          // };
-
-          // for (const rider of riderDeviceTokens) {
-          //   console.log('rider', rider);
-          //   for (const deviceToken of rider.deviceTokens) {
-          //     await this.notificationService.sendAndStoreDeliveryRequestNotification(
-          //       rider.userId,
-          //       deviceToken,
-          //       title,
-          //       message,
-          //       { ...data, riderId: rider.riderId.toString() },
-          //     );
-          //   }
-          // }
-
-          return payment;
+        if (order.order_type === OrderType.TRANSPORTATION_ONLY) {
+          payment_by = UserType.CUSTOMER;
+          customer_id = order.customer_id;
+        } else {
+          payment_by = UserType.WAREHOUSE;
+          warehouse_id = order.warehouse_id;
         }
-        return null;
+        const fare_amount = Number(order.total_cost);
+        const gst = Number(order.gst);
+        const payable_amount = Number(fare_amount) + Number(gst);
+        const tradebar_fee = payable_amount * tradebar_percentage;
+        const net_balance = payable_amount - tradebar_fee;
+
+        const createUserPaymentHistoryDto: CreateUserPaymentHistoryForDeliveryDto =
+          {
+            transaction_type: PaymentTransactionType.CREDIT,
+            payment_status: payment_status,
+            payment_by: payment_by,
+            payment_for: UserType.RIDER,
+            payment_id: payment.id,
+            customer_id: customer_id,
+            warehouse_id: warehouse_id,
+            rider_id: delivery.rider_id,
+            order_id: orderId,
+            payable_amount: payable_amount,
+            fare_amount: fare_amount,
+            gst: gst,
+            tradebar_fee: tradebar_fee,
+            net_balance: net_balance,
+            paid_at: new Date(),
+          };
+
+        const userPaymentHistory =
+          await this.userPaymentHistoryService.createPaymentHistoryForDelivery(
+            createUserPaymentHistoryDto,
+          );
+
+        console.log('userPaymentHistory', userPaymentHistory);
+
+        // return userPaymentHistory;
+
+        //Sent notification
+        //.....
+        // return payment;
       }
+      return null;
     } catch (error) {
       console.error(error);
       throw new Error('Payment not found or update failed');
     }
   }
-  // async makePayment(deliveryId: number): Promise<{
-  //   status: string;
-  //   message: string;
-  //   data: Stripe.PaymentIntent | null;
-  // }> {
-  //   console.log('deliveryId', deliveryId);
-  //   const query = `
-  //   SELECT
-  //       d.id,
-  //       d.order_id,
-  //       d.delivery_charge,
-  //       o.order_type as order_type,
-
-  //       uc.id as customer_user_id,
-
-  //       w.id as warehouse_id,
-  //       w.name as warehouse_name,
-
-  //       wb.id as warehouse_branch_id,
-  //       wb.name as warehouse_branch_name,
-
-  //       c.id as customer_id,
-  //       c.first_name as customer_first_name,
-  //       c.last_name as customer_last_name
-
-  //   FROM
-  //     deliveries d
-  //   INNER JOIN
-  //     orders o ON o.id = d.order_id
-  //   LEFT JOIN
-  //     customers c ON c.id = o.customer_id
-  //   LEFT JOIN
-  //     users uc ON uc.id = c.user_id
-  //   LEFT JOIN
-  //     warehouses w ON w.id = o.warehouse_id
-  //   LEFT JOIN
-  //     warehouse_branches wb ON wb.warehouse_id = w.id
-  //   WHERE
-  //     d.id = ?
-  //   `;
-
-  //   const results = await this.entityManager.query(query, [deliveryId]);
-  //   console.log('delivery results form payment', results[0]);
-
-  //   const amount = results[0]?.delivery_charge * 100;
-
-  //   if (results[0]?.order_type === OrderType.TRANSPORTATION_ONLY) {
-  //     const customerDetails = await this.entityManager.query(
-  //       'SELECT * FROM users WHERE id = ? LIMIT 1',
-  //       [results[0]?.customer_user_id],
-  //     );
-
-  //     if (customerDetails.length === 0) {
-  //       return {
-  //         status: 'error',
-  //         message: 'Customer not found',
-  //         data: null,
-  //       };
-  //     }
-
-  //     const customerStripeId = customerDetails[0]?.stripe_id;
-
-  //     console.log('customerStripeId', customerStripeId);
-  //     if (!customerStripeId) {
-  //       return {
-  //         status: 'error',
-  //         message: 'Customer stripe ID not found',
-  //         data: null,
-  //       };
-  //     }
-
-  //     try {
-  //       const customer = await this.stripe.customers.retrieve(customerStripeId);
-
-  //       console.log('customer from stripe', customer);
-
-  //       if ((customer as Stripe.DeletedCustomer).deleted) {
-  //         return {
-  //           status: 'error',
-  //           message: 'Customer has been deleted',
-  //           data: null,
-  //         };
-  //       }
-
-  //       const activeCustomer = customer as Stripe.Customer;
-
-  //       console.log('activeCustomer', activeCustomer);
-
-  //       const defaultPaymentMethod =
-  //         activeCustomer.invoice_settings.default_payment_method;
-  //       if (!defaultPaymentMethod) {
-  //         return {
-  //           status: 'error',
-  //           message: 'No default payment method set',
-  //           data: null,
-  //         };
-  //       }
-
-  //       const paymentIntent = await this.stripe.paymentIntents.create({
-  //         amount,
-  //         currency: 'aud',
-  //         customer: customerStripeId,
-  //         payment_method: defaultPaymentMethod as string,
-  //         off_session: true,
-  //         confirm: true,
-  //       });
-
-  //       this.storePaymentStatus(
-  //         results[0]?.order_id,
-  //         paymentIntent.id,
-  //         PaymentStatus.PAID,
-  //       );
-
-  //       return {
-  //         status: 'success',
-  //         message: 'Charge successful',
-  //         data: paymentIntent,
-  //       };
-  //     } catch (error) {
-  //       return {
-  //         status: 'error',
-  //         message: error.message,
-  //         data: null,
-  //       };
-  //     }
-  //   }
-  // }
 }

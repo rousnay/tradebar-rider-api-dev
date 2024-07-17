@@ -17,6 +17,8 @@ import { DeliveryRequestNotificationSchema } from '@modules/notification/notific
 import { DeliveryNotificationService } from './delivery.notification.service';
 import { ConfigModule } from '@config/config.module';
 import { DeliveryPaymentService } from './delivery-payment.service';
+import { UserPaymentHistoryService } from '@modules/user-payment-history/user-payment-history.service';
+import { UserPaymentHistory } from '@modules/user-payment-history/user-payment-history.entity';
 // import { NotificationService } from '@modules/notification/notification.service';
 
 @Module({
@@ -24,7 +26,7 @@ import { DeliveryPaymentService } from './delivery-payment.service';
     ConfigModule,
     LocationModule,
     NotificationsModule,
-    TypeOrmModule.forFeature([DeliveryRequest]),
+    TypeOrmModule.forFeature([DeliveryRequest, UserPaymentHistory]),
     MongooseModule.forFeature([
       { name: DeliveryRequest.name, schema: DeliveryRequestSchema },
       {
@@ -39,6 +41,7 @@ import { DeliveryPaymentService } from './delivery-payment.service';
     DeliveryRequestService,
     DeliveryNotificationService,
     DeliveryPaymentService,
+    UserPaymentHistoryService,
     // NotificationService,
   ],
   controllers: [DeliveryController, DeliveryRequestController],

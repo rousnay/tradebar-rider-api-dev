@@ -14,7 +14,7 @@ import {
 } from '@common/enums/payment.enum';
 import { UserType } from '@common/enums/user.enum';
 
-export class CreateUserPaymentHistoryDto {
+export class CreateUserPaymentHistoryForDeliveryDto {
   @ApiProperty({ required: false })
   @IsInt()
   @IsOptional()
@@ -91,36 +91,6 @@ export class CreateUserPaymentHistoryDto {
   net_balance?: number;
 
   @ApiProperty({ required: false })
-  @IsNumber()
-  @IsOptional()
-  settlement_amount?: number;
-
-  @ApiProperty({ required: false })
-  @IsNumber()
-  @IsOptional()
-  refund_amount?: number;
-
-  @ApiProperty({ required: false })
-  @IsString()
-  @IsOptional()
-  remarks?: string;
-
-  @ApiProperty({ required: false })
-  @IsInt()
-  @IsOptional()
-  cf_media_id?: number;
-
-  @ApiProperty({ required: false })
-  @IsDateString()
-  @IsOptional()
-  created_at?: Date;
-
-  @ApiProperty({ required: false })
-  @IsDateString()
-  @IsOptional()
-  partial_paid_at?: Date;
-
-  @ApiProperty({ required: false })
   @IsDateString()
   @IsOptional()
   paid_at?: Date;
@@ -129,21 +99,6 @@ export class CreateUserPaymentHistoryDto {
   @IsDateString()
   @IsOptional()
   failed_at?: Date;
-
-  @ApiProperty({ required: false })
-  @IsDateString()
-  @IsOptional()
-  partial_refunded_at?: Date;
-
-  @ApiProperty({ required: false })
-  @IsDateString()
-  @IsOptional()
-  refunded_at?: Date;
-
-  @ApiProperty({ required: false })
-  @IsDateString()
-  @IsOptional()
-  settlement_at?: Date;
 
   @ApiProperty({ required: false })
   @IsDateString()

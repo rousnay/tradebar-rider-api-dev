@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Not, Repository } from 'typeorm';
 // import { CreateUserPaymentHistoryDto } from './dtos/create-user-payment-history.dto';
@@ -7,6 +13,9 @@ import { Model } from 'mongoose';
 import { UserPaymentHistory } from './user-payment-history.entity';
 import { DeliveryRequest } from '@modules/delivery/schemas/delivery-request.schema';
 import { InjectModel } from '@nestjs/mongoose';
+import { CreateUserPaymentHistoryDto } from './dtos/create-user-payment-history.dto';
+import { UpdateUserPaymentHistoryDto } from './dtos/update-user-payment-history.dto';
+import { CreateUserPaymentHistoryForDeliveryDto } from './dtos/create-user-payment-history-for-delivery.dto';
 
 @Injectable()
 export class UserPaymentHistoryService {
@@ -50,5 +59,39 @@ export class UserPaymentHistoryService {
       total_earnings: total_earnings,
       total_trip_time: total_trip_time,
     };
+  }
+
+  async create(
+    createUserPaymentHistoryDto: CreateUserPaymentHistoryDto,
+  ): Promise<UserPaymentHistory> {
+    const userPaymentHistory = this.userPaymentHistoryRepository.create(
+      createUserPaymentHistoryDto,
+    );
+    return await this.userPaymentHistoryRepository.save(userPaymentHistory);
+  }
+
+  async update(
+    id: number,
+    updateUserPaymentHistoryDto: UpdateUserPaymentHistoryDto,
+  ): Promise<UserPaymentHistory> {
+    const userPaymentHistory = await this.userPaymentHistoryRepository.findOne({
+      where: { id },
+    });
+    if (!userPaymentHistory) {
+      throw new NotFoundException(`UserPaymentHistory with ID ${id} not found`);
+    }
+    // Object.assign(userPaymentHistory, updateUserPaymentHistoryDto);
+    return await this.userPaymentHistoryRepository.save(
+      updateUserPaymentHistoryDto,
+    );
+  }
+
+  async createPaymentHistoryForDelivery(
+    createUserPaymentHistoryForDeliveryDto: CreateUserPaymentHistoryForDeliveryDto,
+  ): Promise<UserPaymentHistory> {
+    const userPaymentHistory = this.userPaymentHistoryRepository.create(
+      createUserPaymentHistoryForDeliveryDto,
+    );
+    return await this.userPaymentHistoryRepository.save(userPaymentHistory);
   }
 }
