@@ -303,9 +303,9 @@ export class DeliveryRequestService {
         JSON.stringify(notificationSentToDeviceTokens, null, 2),
       );
 
-      await this.LocationGateway.updateOrderStatus(
-        updatedDeliveryRequest?.orderId,
-      );
+      // await this.LocationGateway.updateOrderStatus(
+      //   updatedDeliveryRequest?.orderId,
+      // );
     } catch (error) {
       console.error('Error updating statuses:', error);
     }

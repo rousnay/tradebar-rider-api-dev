@@ -31,21 +31,7 @@
       console.log('Connected to WebSocket server');
     });
 
-    // socket.on('locationUpdated', (location) => {
-    //   const messagesDiv = document.getElementById('messages');
-    //   const messageElement = document.createElement('div');
-    //   messageElement.textContent = `Rider ${location.riderId} is at (${location.latitude}, ${location.longitude})`;
-    //   messagesDiv.appendChild(messageElement);
-    // });
-
-    socket.on('orderStatusUpdatedx', (location) => {
-      const messagesDiv = document.getElementById('messages');
-      const messageElement = document.createElement('div');
-      messageElement.textContent = `Order ${location}`;
-      messagesDiv.appendChild(messageElement);
-    });
-
-    socket.on('locationUpdatedx', (location) => {
+    socket.on('locationUpdated', (location) => {
       const messagesDiv = document.getElementById('messages');
       const messageElement = document.createElement('div');
       messageElement.textContent = `Rider ${location.riderId} is at (${location.latitude}, ${location.longitude})`;
@@ -62,13 +48,8 @@
       const longitude = parseFloat(longitudeInput.value);
 
       if (riderId && !isNaN(latitude) && !isNaN(longitude)) {
-
-        socket.emit('updateOrderStatus', 296);
-        socket.emit('updateOrderStatusx', "296");
         socket.emit('updateLocation', { riderId, latitude, longitude });
-
-        socket.emit('updateLocationx', { riderId, latitude, longitude });
-
+        socket.emit('updateOrderStatus', 296);
         // riderIdInput.value = '';
         // latitudeInput.value = '';
         // longitudeInput.value = '';
