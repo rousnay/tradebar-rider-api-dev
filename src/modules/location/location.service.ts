@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 // import { REQUEST } from '@nestjs/core';
 import { Model } from 'mongoose';
@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Riders } from '@modules/riders/entities/riders.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { Vehicles } from '@modules/riders/entities/vehicles.entity';
+import { OngoingOrder } from './schemas/ongoing-order.schema';
 
 @Injectable()
 export class LocationService {
@@ -21,6 +22,7 @@ export class LocationService {
   constructor(
     // @Inject(REQUEST) private readonly request: Request,
     @InjectModel('Location') private locationModel: Model<Location>,
+    @InjectModel('OngoingOrder') private ongoingOrderModel: Model<OngoingOrder>,
     private readonly entityManager: EntityManager,
     @InjectRepository(Vehicles)
     private vehiclesRepository: Repository<Vehicles>,
@@ -212,5 +214,37 @@ export class LocationService {
       .findOne({ riderId })
       .sort({ updatedAt: -1 })
       .exec();
+  }
+
+  async updateOngoingOrder(
+    orderId: number,
+    deliveryId: number,
+    shippingStatus: string,
+    title: string,
+    message: string,
+  ): Promise<OngoingOrder> {
+    const updateData: Partial<OngoingOrder> = {
+      orderId,
+      deliveryId,
+      shippingStatus,
+      title,
+      message,
+      updatedAt: new Date(),
+    };
+
+    let existingOrder = await this.ongoingOrderModel.findOne({ orderId });
+
+    if (!existingOrder) {
+      // Create a new order if it doesn't exist
+      existingOrder = new this.ongoingOrderModel({
+        ...updateData,
+        createdAt: new Date(),
+      });
+    } else {
+      // Update the existing order with the new data
+      existingOrder.set(updateData);
+    }
+
+    return existingOrder.save();
   }
 }

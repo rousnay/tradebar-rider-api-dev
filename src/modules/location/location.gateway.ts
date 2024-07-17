@@ -1,4 +1,5 @@
 import {
+  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -12,13 +13,14 @@ import { EntityManager } from 'typeorm';
 @WebSocketGateway({
   cors: true,
 })
-// @Injectable()
+@Injectable()
 export class LocationGateway {
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('LocationGateway');
 
   constructor(
-    private readonly locationService: LocationService, // private readonly entityManager: EntityManager,
+    private readonly locationService: LocationService,
+    private readonly entityManager: EntityManager,
   ) {}
 
   afterInit(server: Server) {
@@ -62,96 +64,97 @@ export class LocationGateway {
     client.emit('riderLocation', location);
   }
 
-  // @SubscribeMessage('updateOrderStatus')
-  // async updateOrderStatus(orderId: number) {
-  //   try {
-  //     const delivery = await this.entityManager.query(
-  //       'SELECT * FROM deliveries WHERE order_id = ?',
-  //       [orderId],
-  //     );
+  @SubscribeMessage('updateOrderStatus')
+  async onUpdateOrderStatus(@MessageBody() order_id: number) {
+    const orderId = Number(order_id);
+    try {
+      console.log(orderId);
 
-  //     if (!delivery || !delivery.length) {
-  //       throw new Error('Delivery not found');
-  //     }
+      const delivery = await this.entityManager.query(
+        'SELECT * FROM deliveries WHERE order_id = ?',
+        [orderId],
+      );
 
-  //     const { id, shipping_status } = delivery[0];
-  //     let title = '';
-  //     let message = '';
+      if (!delivery || !delivery.length) {
+        throw new Error('Delivery not found');
+      }
 
-  //     switch (shipping_status) {
-  //       case ShippingStatus.WAITING:
-  //         title = 'Order waiting';
-  //         message = 'Your order has been placed and waiting for confirmation';
-  //         break;
-  //       case ShippingStatus.SEARCHING:
-  //         title = 'Searching for a rider';
-  //         message = 'Be patient, we are searching for a rider for your order';
-  //         break;
-  //       case ShippingStatus.ACCEPTED:
-  //         title = 'Order accepted';
-  //         message =
-  //           'Your order has been accepted, the rider is on the way to pickup';
-  //         break;
-  //       case ShippingStatus.REACHED_AT_PICKUP_POINT:
-  //         title = 'The rider reached at pickup point';
-  //         message = 'The rider is waiting for the order to be picked up.';
-  //         break;
-  //       case ShippingStatus.PICKED_UP:
-  //         title = 'Order picked up';
-  //         message =
-  //           'The rider has picked up the order, and is on the way to delivery point';
-  //         break;
-  //       case ShippingStatus.REACHED_AT_DELIVERY_POINT:
-  //         title = 'The rider reached at delivery point';
-  //         message = 'The rider is waiting for the order to be delivered';
-  //         break;
-  //       case ShippingStatus.DELIVERED:
-  //         title = 'Order delivered';
-  //         message = 'The rider has delivered the order';
-  //         break;
-  //       case ShippingStatus.CANCELLED:
-  //         title = 'Order cancelled';
-  //         message = 'The order has been cancelled by the rider';
-  //         break;
-  //       case ShippingStatus.EXPIRED:
-  //         title = 'Order expired';
-  //         message = 'The order has been expired';
-  //         break;
-  //       default:
-  //         title = 'Order updated';
-  //         message = 'The order has been updated';
-  //         break;
-  //     }
+      const { id, shipping_status } = delivery[0];
+      let title = '';
+      let message = '';
 
-  //     console.log(
-  //       'FROM WS:',
-  //       `orderStatusUpdated_${orderId}`,
-  //       'OrderId:',
-  //       orderId,
-  //       'DeliveryId:',
-  //       id,
-  //       'Order Status:',
-  //       shipping_status,
-  //       'Title:',
-  //       title,
-  //       'Message:',
-  //       message,
-  //     );
+      switch (shipping_status) {
+        case ShippingStatus.WAITING:
+          title = 'Order waiting';
+          message = 'Your order has been placed and waiting for confirmation';
+          break;
+        case ShippingStatus.SEARCHING:
+          title = 'Searching for a rider';
+          message = 'Be patient, we are searching for a rider for your order';
+          break;
+        case ShippingStatus.ACCEPTED:
+          title = 'Order accepted';
+          message =
+            'Your order has been accepted, the rider is on the way to pickup';
+          break;
+        case ShippingStatus.REACHED_AT_PICKUP_POINT:
+          title = 'The rider reached at pickup point';
+          message = 'The rider is waiting for the order to be picked up.';
+          break;
+        case ShippingStatus.PICKED_UP:
+          title = 'Order picked up';
+          message =
+            'The rider has picked up the order, and is on the way to delivery point';
+          break;
+        case ShippingStatus.REACHED_AT_DELIVERY_POINT:
+          title = 'The rider reached at delivery point';
+          message = 'The rider is waiting for the order to be delivered';
+          break;
+        case ShippingStatus.DELIVERED:
+          title = 'Order delivered';
+          message = 'The rider has delivered the order';
+          break;
+        case ShippingStatus.CANCELLED:
+          title = 'Order cancelled';
+          message = 'The order has been cancelled by the rider';
+          break;
+        case ShippingStatus.EXPIRED:
+          title = 'Order expired';
+          message = 'The order has been expired';
+          break;
+        default:
+          title = 'Order updated';
+          message = 'The order has been updated';
+          break;
+      }
 
-  //     this.server.emit(
-  //       `orderStatusUpdated_${orderId}`,
-  //       {
-  //         orderId,
-  //         deliveryId: id,
-  //         shippingStatus: shipping_status,
-  //         title,
-  //         message,
-  //       },
-  //       (data) => console.log('FROM WS emit orderStatusUpdated: ', data),
-  //     );
-  //   } catch (error) {
-  //     console.error('Error updating order status:', error);
-  //     // Handle error as per your application's requirements
-  //   }
-  // }
+      console.log(
+        'FROM WS:',
+        `orderStatusUpdated_${orderId}`,
+        'OrderId:',
+        orderId,
+        'DeliveryId:',
+        id,
+        'Order Status:',
+        shipping_status,
+        'Title:',
+        title,
+        'Message:',
+        message,
+      );
+
+      const ongoingOrderStatus = await this.locationService.updateOngoingOrder(
+        orderId,
+        id,
+        shipping_status,
+        title,
+        message,
+      );
+
+      this.server.emit(`orderStatusUpdated_${orderId}`, ongoingOrderStatus);
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      // Handle error as per your application's requirements
+    }
+  }
 }
