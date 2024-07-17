@@ -6,6 +6,7 @@ import { LocationGateway } from './location.gateway';
 import { LocationSchema } from './schemas/location.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Vehicles } from '@modules/riders/entities/vehicles.entity';
+// import { DeliveryRequestService } from '@modules/delivery/delivery-request.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { Vehicles } from '@modules/riders/entities/vehicles.entity';
     TypeOrmModule.forFeature([Vehicles]),
   ],
   providers: [LocationService, LocationGateway],
-  exports: [LocationService],
+  exports: [LocationService, LocationGateway],
   controllers: [LocationController],
 })
 export class LocationModule {}

@@ -7,6 +7,7 @@ import {
 import { EntityManager } from 'typeorm';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+
 import { DeliveryRequest } from './schemas/delivery-request.schema';
 import { ShippingStatus } from '@common/enums/delivery.enum';
 import { REQUEST } from '@nestjs/core';
@@ -16,6 +17,7 @@ import {
 } from '@modules/notification/notification.schema';
 import { DeliveryNotificationService } from './delivery.notification.service';
 import { DeliveryPaymentService } from './delivery-payment.service';
+import { LocationGateway } from '@modules/location/location.gateway';
 
 @Injectable()
 export class DeliveryRequestService {
@@ -28,6 +30,7 @@ export class DeliveryRequestService {
     private deliveryRequestNotificationModel: Model<DeliveryRequestNotification>,
     private deliveryNotificationService: DeliveryNotificationService,
     private deliveryPaymentService: DeliveryPaymentService,
+    private LocationGateway: LocationGateway,
   ) {}
 
   async findAll(): Promise<DeliveryRequest[]> {
@@ -298,6 +301,10 @@ export class DeliveryRequestService {
       console.log(
         'Delivery Status - ACCEPTED, notificationSentToDeviceTokens',
         JSON.stringify(notificationSentToDeviceTokens, null, 2),
+      );
+
+      await this.LocationGateway.updateOrderStatus(
+        updatedDeliveryRequest?.orderId,
       );
     } catch (error) {
       console.error('Error updating statuses:', error);

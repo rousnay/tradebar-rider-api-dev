@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DeliveryService } from './delivery.service';
 import { DeliveryController } from './delivery.controller';
-import { LocationService } from '@modules/location/location.service';
-import { LocationSchema } from '@modules/location/schemas/location.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LocationModule } from '@modules/location/location.module';
 import {
@@ -19,7 +17,6 @@ import { ConfigModule } from '@config/config.module';
 import { DeliveryPaymentService } from './delivery-payment.service';
 import { UserPaymentHistoryService } from '@modules/user-payment-history/user-payment-history.service';
 import { UserPaymentHistory } from '@modules/user-payment-history/user-payment-history.entity';
-// import { NotificationService } from '@modules/notification/notification.service';
 
 @Module({
   imports: [
@@ -42,7 +39,6 @@ import { UserPaymentHistory } from '@modules/user-payment-history/user-payment-h
     DeliveryNotificationService,
     DeliveryPaymentService,
     UserPaymentHistoryService,
-    // NotificationService,
   ],
   controllers: [DeliveryController, DeliveryRequestController],
 })
