@@ -54,6 +54,7 @@ export class LocationGateway {
 
     //Use this.server.emit instead of client.emit to broadcast the update to all connected clients.
     this.server.emit('locationUpdated', location);
+    this.server.emit(`locationUpdated_${payload.riderId}`, location);
   }
 
   @SubscribeMessage('getRiderLocation')

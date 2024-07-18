@@ -38,7 +38,14 @@
       messagesDiv.appendChild(messageElement);
     });
 
-    const orderId = 296
+
+
+    const riderId = 3;
+    socket.on(`locationUpdated_${riderId}`, (location) => {
+      console.log(location);
+    });
+
+    const orderId = 296;
 
     socket.on(`orderStatusUpdated_${orderId}`, (ongoingOrder) => {
       console.log(ongoingOrder);
