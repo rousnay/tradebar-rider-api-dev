@@ -162,6 +162,10 @@ export class DeliveryRequestService {
       JSON.stringify(notificationSentToDeviceTokens, null, 2),
     );
 
+    await this.LocationGateway.onUpdateOrderStatus(
+      updatedDeliveryRequest?.orderId,
+    );
+
     return updatedDeliveryRequest;
   }
 
