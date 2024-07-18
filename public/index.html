@@ -34,7 +34,7 @@
     socket.on('locationUpdated', (location) => {
       const messagesDiv = document.getElementById('messages');
       const messageElement = document.createElement('div');
-      messageElement.textContent = `Rider ${location.riderId} is at (${location.latitude}, ${location.longitude})`;
+      messageElement.textContent = `Rider ${location.riderId} is at (Lat: ${location?.location?.coordinates[1]}, Long: ${location?.location?.coordinates[0]})`;
       messagesDiv.appendChild(messageElement);
     });
 
