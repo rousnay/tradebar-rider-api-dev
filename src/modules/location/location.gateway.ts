@@ -66,11 +66,11 @@ export class LocationGateway {
   }
 
   @SubscribeMessage('updateOrderStatus')
-  async onUpdateOrderStatus(@MessageBody() order_id: number) {
-    const orderId = Number(order_id);
-    try {
-      console.log(orderId);
+  async onUpdateOrderStatus(@MessageBody() payload: { orderId: number }) {
+    console.log(payload);
+    const orderId = Number(payload.orderId);
 
+    try {
       const delivery = await this.entityManager.query(
         'SELECT * FROM deliveries WHERE order_id = ?',
         [orderId],

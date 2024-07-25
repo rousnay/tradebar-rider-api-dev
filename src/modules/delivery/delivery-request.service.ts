@@ -162,9 +162,9 @@ export class DeliveryRequestService {
       JSON.stringify(notificationSentToDeviceTokens, null, 2),
     );
 
-    await this.LocationGateway.onUpdateOrderStatus(
-      updatedDeliveryRequest?.orderId,
-    );
+    await this.LocationGateway.onUpdateOrderStatus({
+      orderId: updatedDeliveryRequest?.orderId,
+    });
 
     return updatedDeliveryRequest;
   }
@@ -307,9 +307,9 @@ export class DeliveryRequestService {
         JSON.stringify(notificationSentToDeviceTokens, null, 2),
       );
 
-      await this.LocationGateway.onUpdateOrderStatus(
-        updatedDeliveryRequest?.orderId,
-      );
+      await this.LocationGateway.onUpdateOrderStatus({
+        orderId: updatedDeliveryRequest?.orderId,
+      });
     } catch (error) {
       console.error('Error updating statuses:', error);
     }
