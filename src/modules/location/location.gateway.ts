@@ -117,7 +117,7 @@ export class LocationGateway {
           break;
         case ShippingStatus.CANCELLED:
           title = 'Order cancelled';
-          message = 'The order has been cancelled by the rider';
+          message = 'The delivery request has been cancelled';
           break;
         case ShippingStatus.EXPIRED:
           title = 'Order expired';
