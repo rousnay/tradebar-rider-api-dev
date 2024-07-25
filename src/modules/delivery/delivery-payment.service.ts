@@ -15,6 +15,7 @@ import {
 import { UserType } from '@common/enums/user.enum';
 import { UserPaymentHistoryService } from '@modules/user-payment-history/user-payment-history.service';
 import { CreateUserPaymentHistoryForDeliveryDto } from '@modules/user-payment-history/dtos/create-user-payment-history-for-delivery.dto';
+import { AppVariables } from '@common/utils/variables';
 
 @Injectable()
 export class DeliveryPaymentService {
@@ -36,7 +37,7 @@ export class DeliveryPaymentService {
     userId: number,
     orderId: number,
     stripeId: string,
-    deliveryCost: number,
+    deliveryCost: string,
   ): Promise<{
     status: string;
     message: string;
@@ -69,7 +70,7 @@ export class DeliveryPaymentService {
       }
 
       const paymentIntent = await this.stripe.paymentIntents.create({
-        amount: deliveryCost * 100,
+        amount: Number(deliveryCost) * 100,
         currency: 'aud',
         customer: stripeId,
         payment_method: defaultPaymentMethod as string,
@@ -187,7 +188,7 @@ export class DeliveryPaymentService {
           .where('d.order_id = :orderId', { orderId })
           .getRawOne();
 
-        const tradebar_percentage = 0.1;
+        const tradebar_percentage = AppVariables.tradebar_fee.percentage / 100;
         let payment_by = null;
         let customer_id = null;
         let warehouse_id = null;

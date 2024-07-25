@@ -66,6 +66,11 @@ export class CreateUserPaymentHistoryDto {
   order_id?: number;
 
   @ApiProperty({ required: false })
+  @IsInt()
+  @IsOptional()
+  tradebar_fee_id?: number;
+
+  @ApiProperty({ required: false })
   @IsNumber()
   @IsOptional()
   payable_amount?: number;

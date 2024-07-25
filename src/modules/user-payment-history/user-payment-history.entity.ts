@@ -63,6 +63,9 @@ export class UserPaymentHistory {
   @Column({ nullable: true })
   order_id: number;
 
+  @Column({ nullable: true })
+  tradebar_fee_id: number;
+
   // @Column({ nullable: true })
   // settlement_id: number;
 

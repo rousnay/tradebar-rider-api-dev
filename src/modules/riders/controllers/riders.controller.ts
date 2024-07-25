@@ -31,7 +31,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 
 import { JwtAuthGuard } from '@core/guards/jwt-auth.guard';
-import { profileImageInterceptor } from '@core/interceptors/file-interceptor';
+import { profileImageInterceptor } from '@core/interceptors/file.interceptor';
 import { CloudflareMediaService } from '@services/cloudflare-media-upload.service';
 import { RidersService } from '../services/riders.service';
 import { Riders } from '../entities/riders.entity';

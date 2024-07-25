@@ -9,10 +9,11 @@ export interface Delivery extends Document {
   order_id?: number;
   customer?: object;
   warehouse?: object;
-  total_weight?: number;
-  init_distance?: number;
-  init_duration?: number;
-  delivery_charge?: number;
+  total_weight?: string;
+  init_distance?: string;
+  init_duration?: string;
+  delivery_charge?: string;
+  rider_fee?: string;
   created_at?: Date;
 }
 

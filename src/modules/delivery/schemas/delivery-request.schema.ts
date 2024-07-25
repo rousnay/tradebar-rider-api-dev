@@ -57,7 +57,10 @@ export class DeliveryRequest extends Document {
   totalWeight: string;
 
   @Prop({ required: true })
-  deliveryCost: number;
+  deliveryCost: string;
+
+  @Prop({ required: true })
+  riderFee: string;
 
   @Prop({ required: true })
   estimatedArrivalTime: string;
