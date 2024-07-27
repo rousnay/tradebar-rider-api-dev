@@ -225,7 +225,7 @@ export class DeliveryRequestService {
         updatedDeliveryRequest.requestFrom.userId,
         updatedDeliveryRequest.orderId,
         updatedDeliveryRequest.stripeId,
-        updatedDeliveryRequest.deliveryCost,
+        Number(updatedDeliveryRequest.deliveryCost),
       );
       console.log('Delivery Payment:', deliveryPayment);
       //......

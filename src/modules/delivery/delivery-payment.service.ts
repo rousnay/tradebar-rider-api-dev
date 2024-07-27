@@ -37,14 +37,23 @@ export class DeliveryPaymentService {
     userId: number,
     orderId: number,
     stripeId: string,
-    deliveryCost: string,
+    deliveryCost: number,
   ): Promise<{
     status: string;
     message: string;
     data: Stripe.PaymentIntent | null;
   }> {
     console.log('makePayment called');
-    console.log('userId', userId, 'orderId', orderId, 'stripeId', stripeId);
+    console.log(
+      'userId',
+      userId,
+      'orderId',
+      orderId,
+      'stripeId',
+      stripeId,
+      'deliveryCost',
+      deliveryCost,
+    );
 
     try {
       const customer = await this.stripe.customers.retrieve(stripeId);
@@ -69,8 +78,10 @@ export class DeliveryPaymentService {
         };
       }
 
+      const stripeAmount = Math.round(deliveryCost * 100);
+
       const paymentIntent = await this.stripe.paymentIntents.create({
-        amount: Number(deliveryCost) * 100,
+        amount: stripeAmount,
         currency: 'aud',
         customer: stripeId,
         payment_method: defaultPaymentMethod as string,
@@ -188,7 +199,11 @@ export class DeliveryPaymentService {
           .where('d.order_id = :orderId', { orderId })
           .getRawOne();
 
-        const tradebar_percentage = AppVariables.tradebar_fee.percentage / 100;
+        const the_tradebar_fee = await AppVariables.tradebarFee.percentage;
+
+        console.log('the_tradebar_fee', the_tradebar_fee);
+
+        const tradebar_percentage = the_tradebar_fee / 100;
         let payment_by = null;
         let customer_id = null;
         let warehouse_id = null;
