@@ -30,8 +30,21 @@ jobs:
           USERNAME: ${{ secrets.DO_USERNAME }}
           SSH_PRIVATE_KEY: ${{ secrets.DO_SSH_KEY }}
           REMOTE_PATH: ${{ secrets.DO_REMOTE_PATH }}
+
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.DO_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }} "cd ${{ secrets.DO_REMOTE_PATH }} && git pull && npm install && npm run build && pm2 restart all"
+
+
+
+      - name: Run stop script
+        run: ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "bash ${{ secrets.REMOTE_PATH }}/stop.sh"
+
+      - name: Remove deploy key
+        run: rm -f ~/.ssh/deploy_key
+
+
+      #     ARGS: '-rltgoDzvO --delete'
+      #     SOURCE: 'dist/'
