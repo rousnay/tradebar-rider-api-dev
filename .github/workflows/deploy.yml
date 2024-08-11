@@ -30,9 +30,9 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           ARGS: '-rltgoDzvO --delete'
           SOURCE: 'dist/'
-          REMOTE_HOST: ${{ secrets.DO_HOST }}
-          REMOTE_USER: ${{ secrets.DO_USERNAME }}
-          TARGET: ${{ secrets.DO_REMOTE_PATH }}
+          REMOTE_HOST: ${{ secrets.HOST }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          TARGET: ${{ secrets.REMOTE_PATH }}
 
       - name: Run start script
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USERNAME }}@${{ secrets.DO_HOST }} "bash ${{ secrets.DO_REMOTE_PATH }}/start.sh"
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} "bash ${{ secrets.REMOTE_PATH }}/start.sh"
