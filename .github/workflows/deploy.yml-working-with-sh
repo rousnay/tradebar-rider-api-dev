@@ -36,8 +36,5 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           rsync -avz -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" ./ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }} --delete
 
-      - name: Install dependencies on server
-        run: ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "cd ${{ secrets.REMOTE_PATH }} && npm install"
-
-      - name: Restart application with PM2
-        run: ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "pm2 stop all && pm2 start dist/main.js --name nestjs-app && pm2 save"
+      - name: Run start script
+        run: ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "bash ${{ secrets.REMOTE_PATH }}/start.sh"
