@@ -6,6 +6,8 @@ export const OngoingOrderSchema = new Schema<OngoingOrder>({
   shippingStatus: { type: String, required: true },
   title: { type: String, required: true },
   message: { type: String, required: true },
+  distance: { type: String, default: null },
+  duration: { type: String, default: null },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -17,6 +19,8 @@ export interface OngoingOrder extends Document {
   shippingStatus: string;
   title: string;
   message: string;
+  distance: string;
+  duration: string;
   createdAt: Date;
   updatedAt: Date;
 }

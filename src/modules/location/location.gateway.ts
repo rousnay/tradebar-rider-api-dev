@@ -53,8 +53,8 @@ export class LocationGateway {
     );
 
     //Use this.server.emit instead of client.emit to broadcast the update to all connected clients.
-    this.server.emit('locationUpdated', location);
-    this.server.emit(`locationUpdated_${payload.riderId}`, location);
+    // this.server.emit('locationUpdated', location);
+    this.server.emit(`riderLocationUpdated_${payload.riderId}`, location);
   }
 
   @SubscribeMessage('getRiderLocation')
@@ -66,7 +66,14 @@ export class LocationGateway {
   }
 
   @SubscribeMessage('updateOrderStatus')
-  async onUpdateOrderStatus(@MessageBody() payload: { orderId: number }) {
+  async onUpdateOrderStatus(
+    @MessageBody()
+    payload: {
+      orderId: number;
+      distance?: string;
+      duration?: string;
+    },
+  ) {
     console.log(payload);
     const orderId = Number(payload.orderId);
 
@@ -142,6 +149,10 @@ export class LocationGateway {
         title,
         'Message:',
         message,
+        'Distance:',
+        payload.distance,
+        'Duration:',
+        payload.duration,
       );
 
       const ongoingOrderStatus = await this.locationService.updateOngoingOrder(
@@ -150,6 +161,8 @@ export class LocationGateway {
         shipping_status,
         title,
         message,
+        payload.distance,
+        payload.duration,
       );
 
       this.server.emit(`orderStatusUpdated_${orderId}`, ongoingOrderStatus);

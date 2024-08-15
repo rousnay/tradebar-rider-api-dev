@@ -216,35 +216,84 @@ export class LocationService {
       .exec();
   }
 
+  // async updateOngoingOrder(
+  //   orderId: number,
+  //   deliveryId: number,
+  //   shippingStatus: string,
+  //   title: string,
+  //   message: string,
+  //   distance?: string,
+  //   duration?: string,
+  // ): Promise<OngoingOrder> {
+  //   const updateData: Partial<OngoingOrder> = {
+  //     orderId,
+  //     deliveryId,
+  //     shippingStatus,
+  //     title,
+  //     message,
+  //     distance,
+  //     duration,
+  //     updatedAt: new Date(),
+  //   };
+
+  //   let existingOrder = await this.ongoingOrderModel.findOne({ orderId });
+
+  //   if (!existingOrder) {
+  //     // Create a new order if it doesn't exist
+  //     existingOrder = new this.ongoingOrderModel({
+  //       ...updateData,
+  //       createdAt: new Date(),
+  //     });
+  //   } else {
+  //     // Update the existing order with the new data
+  //     existingOrder.set(updateData);
+  //   }
+
+  //   return existingOrder.save();
+  // }
+
   async updateOngoingOrder(
     orderId: number,
     deliveryId: number,
     shippingStatus: string,
     title: string,
     message: string,
+    distance?: string,
+    duration?: string,
   ): Promise<OngoingOrder> {
-    const updateData: Partial<OngoingOrder> = {
-      orderId,
-      deliveryId,
-      shippingStatus,
-      title,
-      message,
-      updatedAt: new Date(),
-    };
-
-    let existingOrder = await this.ongoingOrderModel.findOne({ orderId });
+    // Find the existing order
+    const existingOrder = await this.ongoingOrderModel.findOne({ orderId });
 
     if (!existingOrder) {
       // Create a new order if it doesn't exist
-      existingOrder = new this.ongoingOrderModel({
-        ...updateData,
+      const newOrder = new this.ongoingOrderModel({
+        orderId,
+        deliveryId,
+        shippingStatus,
+        title,
+        message,
+        distance,
+        duration,
         createdAt: new Date(),
+        updatedAt: new Date(),
       });
+      return newOrder.save();
     } else {
-      // Update the existing order with the new data
-      existingOrder.set(updateData);
-    }
+      // Update the existing order with the new data, preserving distance and duration if not provided
+      existingOrder.shippingStatus = shippingStatus;
+      existingOrder.title = title;
+      existingOrder.message = message;
+      existingOrder.updatedAt = new Date();
 
-    return existingOrder.save();
+      if (distance !== undefined) {
+        existingOrder.distance = distance;
+      }
+
+      if (duration !== undefined) {
+        existingOrder.duration = duration;
+      }
+
+      return existingOrder.save();
+    }
   }
 }
