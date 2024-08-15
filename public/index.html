@@ -27,29 +27,28 @@
     // const socket = io('http://localhost:8000');
     const socket = io('https://cgp-rider-api.onrender.com');
 
+    const riderId = 3;
+
     socket.on('connect', () => {
       console.log('Connected to WebSocket server');
     });
 
-    socket.on('locationUpdated', (location) => {
+    socket.on(`riderLocationUpdated_${riderId}`, (location) => {
       const messagesDiv = document.getElementById('messages');
       const messageElement = document.createElement('div');
       messageElement.textContent = `Rider ${location.riderId} is at (Lat: ${location?.location?.coordinates[1]}, Long: ${location?.location?.coordinates[0]})`;
       messagesDiv.appendChild(messageElement);
     });
 
-
-
-    const riderId = 3;
-    socket.on(`locationUpdated_${riderId}`, (location) => {
+    socket.on(`riderLocationUpdated_${riderId}`, (location) => {
       console.log(location);
     });
 
-    const orderId = 296;
+    // const orderId = 296;
 
-    socket.on(`orderStatusUpdated_${orderId}`, (ongoingOrder) => {
-      console.log(ongoingOrder);
-    });
+    // socket.on(`orderStatusUpdated_${orderId}`, (ongoingOrder) => {
+    //   console.log(ongoingOrder);
+    // });
 
     function sendLocation() {
       const riderIdInput = document.getElementById('riderIdInput');
@@ -62,7 +61,6 @@
 
       if (riderId && !isNaN(latitude) && !isNaN(longitude)) {
         socket.emit('updateLocation', { riderId, latitude, longitude });
-        socket.emit('updateOrderStatus', 296);
         // riderIdInput.value = '';
         // latitudeInput.value = '';
         // longitudeInput.value = '';
