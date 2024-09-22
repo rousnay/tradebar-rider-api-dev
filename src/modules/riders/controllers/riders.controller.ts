@@ -13,6 +13,8 @@ import {
   UseInterceptors,
   UploadedFile,
   ParseIntPipe,
+  InternalServerErrorException,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiHeader,
@@ -185,6 +187,36 @@ export class RiderController {
       };
     } catch (error) {
       throw new Error(`Error fetching user: ${error.message}`);
+    }
+  }
+
+  @Delete('/remove-account')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access_token')
+  @ApiOperation({
+    summary: 'Remove logged in rider',
+  })
+  @ApiResponse({ status: 200, description: 'Rider removed successfully' })
+  @ApiResponse({ status: 404, description: 'Rider not found' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  async removeRider(): Promise<{ status: string; message: string }> {
+    try {
+      await this.ridersService.removeRider();
+
+      return {
+        status: 'success',
+        message: 'Rider removed successfully',
+      };
+    } catch (error) {
+      // Handle specific error cases
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Rider not found');
+      }
+
+      // Log or handle other types of errors
+      throw new InternalServerErrorException(
+        'An error occurred while removing the rider',
+      );
     }
   }
 }

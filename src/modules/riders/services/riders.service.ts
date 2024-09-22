@@ -185,4 +185,66 @@ export class RidersService {
       },
     };
   }
+
+  async removeRider(): Promise<void> {
+    const userId = this.request['user'].user_id;
+    // Find the customer
+    const rider = await this.ridersRepository.findOne({
+      where: { user_id: userId },
+    });
+
+    if (!rider) {
+      throw new NotFoundException(`Rider with user_id ${userId} not found`);
+    }
+
+    // Query the users table directly using EntityManager
+    const user = await this.entityManager.query(
+      'SELECT * FROM users WHERE id = ?',
+      [userId],
+    );
+
+    if (!user || user.length === 0) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    // Transfer data to user_deleted table using EntityManager
+    await this.entityManager.query(
+      `INSERT INTO user_deleted (user_id, first_name, last_name, phone, email, password, user_type, date_of_birth, gender, profile_image_cf_media_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        rider.user_id,
+        rider.first_name,
+        rider.last_name,
+        rider.phone,
+        rider.email,
+        user[0].password, // Get password from users table
+        user[0].user_type, // Get user_type from users table
+        rider.date_of_birth,
+        rider.gender,
+        rider.profile_image_cf_media_id,
+      ],
+    );
+
+    // Nullify sensitive data in riders table
+    rider.first_name = null;
+    rider.last_name = null;
+    rider.phone = null;
+    rider.email = null;
+    rider.date_of_birth = null;
+    rider.gender = null;
+    rider.is_active = false;
+    rider.profile_image_cf_media_id = null;
+    rider.deleted_at = new Date();
+    await this.ridersRepository.save(rider);
+
+    // Nullify sensitive data in users table using EntityManager
+    await this.entityManager.query(
+      `UPDATE users
+       SET name = NULL, first_name = NULL, last_name = NULL, email = NULL, phone = NULL, password = NULL, active = 0
+       WHERE id = ?`,
+      [userId],
+    );
+
+    console.log('Removed rider with user_id', userId);
+  }
 }
